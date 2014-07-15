@@ -1,0 +1,261 @@
+CImg<unsigned char> imgbis(TAILLE_IMAGE+1,TAILLE_IMAGE+1,1,3);        // Define a 100x100 color image with 8 bits per color component.
+  					img.fill(0);                                 // Set pixel values to 0 (color : black)
+  					//unsigned char purple[] = { 255,0,255 }, red[] = { 255,0,0 }, green[] = { 0,255,0 }, blue[] = { 0,0,255 };      // Define a purple color
+
+						for(int i=0; i<nbre_pts; i++)
+  					{
+							if(tab_value_by_pt[i]==0)
+								img.draw_point ( tab[i][0]*TAILLE_IMAGE, tab[i][1]*TAILLE_IMAGE, 0, red, 1 );
+							if(tab_value_by_pt[i]==1)
+								img.draw_point ( tab[i][0]*TAILLE_IMAGE, tab[i][1]*TAILLE_IMAGE, 0, green, 1 );
+			
+						}
+						//TODO LIST !!! PLUS TARD CREE UN VECTOR AVEC LES NOUVEAUX POINTS, IL FAUDRA AUSSI LES COLORIER
+										
+						for(int i=0; i<L; i++)
+            {
+            	for(int j=0; j<L; j++)
+              {
+
+								if(j!=L-1)
+								{								
+									if(mat_fake_Gij[L-2][i][j][0]!=mat_fake_Gij[L-2][i][j+1][0])
+										img.draw_line (mat_of_all_areas[L-2][i][j][0]*TAILLE_IMAGE, (mat_of_all_areas[L-2][i][j][1]-(double)1/L)*TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][0]*TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][1]*TAILLE_IMAGE, blue, 1, ~0U, true );	
+												//img.draw_line (5, 0, 5, 1000, blue, 1, ~0U, true );
+								}
+								/*else
+								{
+									if(mat_of_all_Gij_CFij[L-2][i][j][0]==mat_of_all_Gij_CFij[L-2][i][j-1][0])
+										img.draw_line (TAILLE_IMAGE, (mat_of_all_areas[L-2][i][j][1]-(double)1/L)*TAILLE_IMAGE, TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][1]*TAILLE_IMAGE, blue, 1, ~0U, true );
+								}*/
+								
+								if(i!=L-1)
+								{
+									if(mat_fake_Gij[L-2][i][j][0]!=mat_fake_Gij[L-2][i+1][j][0])
+										img.draw_line ((mat_of_all_areas[L-2][i][j][0]-(double)1/L)*TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][1]*TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][0]*TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][1]*TAILLE_IMAGE, blue, 1, ~0U, true );
+								}
+								/*else
+								{
+									if(mat_of_all_Gij_CFij[L-2][i][j][0]==mat_of_all_Gij_CFij[L-2][i-1][j][0])
+										img.draw_line ((mat_of_all_areas[L-2][i][j][0]-(double)1/L)*TAILLE_IMAGE, TAILLE_IMAGE, mat_of_all_areas[L-2][i][j][0]*TAILLE_IMAGE, TAILLE_IMAGE, blue, 1, ~0U, true );
+								}*/
+						
+								//on visualise les differentes area
+								/*img.draw_line (mat_of_areas[i][j][0]*TAILLE_IMAGE-1, (mat_of_areas[i][j][1]-1/L)*TAILLE_IMAGE-1, mat_of_areas[i][j][0]*TAILLE_IMAGE-1, (mat_of_areas[i][j][1]-1)*TAILLE_IMAGE, purple, 1, ~0U, true );
+								img.draw_line ((mat_of_areas[i][j][0]-1/L)*TAILLE_IMAGE-1, (mat_of_areas[i][j][1])*TAILLE_IMAGE-1, (mat_of_areas[i][j][0])*TAILLE_IMAGE-1, mat_of_areas[i][j][1]*TAILLE_IMAGE-1, purple, 1, ~0U, true );*/
+							}
+						}
+					
+										
+										//img.display("L = "+L);
+						img.display("test");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*SWITCH AFFICHER GRAPHIQUE; AJOUTER POINT; QUITTER*/
+				int decision(0);
+				double coord1(0), coord2(0);
+				bool ended=false;				
+				int LBIS(0);
+				CImg<unsigned char> img2(TAILLE_IMAGE+1,TAILLE_IMAGE+1,1,3);
+				double alpha1(0), alpha2(0), a1(0), a2(0), b(0);
+
+				while(!ended)				
+				{
+					alpha1=0;
+					alpha2=0;
+					//cout << "Press 0 to leave\nPress 1 to add a point with 2 coordinate\nPress 2 to 7 to see previous graphical" << endl;
+					cout << "Press 0 to leave\nPress 2 to 7 to see previous graphical" << endl;
+					cin >> decision ; 
+				
+					switch(decision)
+					{
+						/*case 1:
+							cout << "Coordinate 1 (on x axis) (座標 1) : " << endl;
+							cin >> coord1;
+							cout << "Coordinate 2 (on y axis) (座標 2) : " << endl;
+							cin >> coord2;
+							for(double L=0; L<8; L++)
+							{
+								for(int i=0; i<L; i++)
+								{
+								for(int j=0; j<L; j++)
+								{
+								if(coord1<mat_of_all_areas[(int)L-2][i][j][0] && coord2<mat_of_all_areas[(int)L-2][i][j][1] && coord1>=(mat_of_all_areas[(int)L-2][i][j][0]-1/L) && coord2>=(mat_of_all_areas[(int)L-2][i][j][1]-1/L))
+              	{
+									a1=(((double)j+1)-1)/(L-1);//car j varie entre 0 et L-1 au lieu de 1 et L
+                	b=1/(L-1);
+
+									a2=(((double)i+1)-1)/(L-1);//de mm que pour j, voir le commentaire ultérieur
+                	//b=1/(L-1);
+
+								
+								
+													//CALC OF ALPHA_1 et ALPHA_2 && calc inst of membership_function
+													if(mat_of_all_Gij_CFij[(int)L-2][i][j][0]==0)
+													{
+														//cout << "point rouge" << endl;
+                            alpha1=max(max(1-(std::fabs(coord1-a1)/b),(double)0)*max(1-(std::fabs(coord2-a2)/b),(double)0)*mat_of_all_Gij_CFij[(int)L-2][i][j][1], alpha1);
+													}
+
+                        	if(mat_of_all_Gij_CFij[(int)L-2][i][j][0]==1)
+													{	
+														//cout << "point vert" << endl;
+                            alpha2=max(max(1-(std::fabs(coord1-a1)/b),(double)0)*max(1-(std::fabs(coord2-a2)/b),(double)0)*mat_of_all_Gij_CFij[(int)L-2][i][j][1], alpha2);
+													}
+
+									}
+							}}}
+							if(alpha1 > alpha2) cout << "this point belongs to the red group (赤いのグループ) (G1)" << endl;
+							else if(alpha1 < alpha2) cout << "this point belongs to the green group (みどりのグループ) (G2)" << endl;
+							else cout << "this point is undeterminated" << endl;
+							break;*/
+						case 2:
+							dessiner_schema((double)2, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						case 3:
+							dessiner_schema((double)3, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						case 4:
+							dessiner_schema((double)4, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						case 5:
+							dessiner_schema((double)5, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						case 6:
+							dessiner_schema((double)6, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						case 7:
+							dessiner_schema((double)7, nbre_pts, tab_value_by_pt, mat_fake_Gij, mat_of_all_areas/*, tab*/);
+							break;
+						default:
+							cout << "Bye bye !" << endl;
+							ended=true;
+							break;
+	
+					}					
+				} //while(ended);
+
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+/*//the 3rd following cases are considering if we are on a edge
+												else if(tab[k][0]==1 && tab[k][1]==1 && tab[k][0]==(mat_of_areas[i][j][0]) && tab[k][1]==(mat_of_areas[i][j][1]-1/L))
+												{
+													a1=(((double)j+1)-1)/(L-1);//car j varie entre 0 et L-1 au lieu de 1 et L
+                        	b1=1/(L-1);
+
+													a2=(((double)i+1)-1)/(L-1);//de mm que pour j, voir le commentaire ultérieur
+                        	b2=1/(L-1);
+
+													x1=tab[k][0];
+													x2=tab[k][1];
+
+													//cout << "calc of memb func of x1 " << max(1-(std::fabs(x1-a1)/b1),(double)0) << endl;
+													//cout << "calc of memb func of x2 " << max(1-(std::fabs(x2-a2)/b2),(double)0) << endl;
+                         	//mat_of_membership_function_value_per_coordinates[i][j][k-1]=max(1-(std::fabs(x-a)/b),(double)0);
+
+													//CALC OF BETA_1 et BETA_2 (adaptibility) && calc inst of membership_function
+													if(tab_value_by_pt[k]==0)
+													{
+														//cout << "point rouge" << endl;
+                            mat_of_adaptability_of_each_area[i][j][0]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}
+
+                        	if(tab_value_by_pt[k]==1)
+													{	
+														//cout << "point vert" << endl;
+                            mat_of_adaptability_of_each_area[i][j][1]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}
+												}
+												else if(tab[k][0]<mat_of_areas[i][j][0] && tab[k][1]==1 && tab[k][0]>=(mat_of_areas[i][j][0]-1/L) && tab[k][1]==(mat_of_areas[i][j][1]))
+												{
+													a1=(((double)j+1)-1)/(L-1);//car j varie entre 0 et L-1 au lieu de 1 et L
+                        	b1=1/(L-1);
+
+													a2=(((double)i+1)-1)/(L-1);//de mm que pour j, voir le commentaire ultérieur
+                        	b2=1/(L-1);
+
+													x1=tab[k][0];
+													x2=tab[k][1];
+
+													//cout << "calc of memb func of x1 " << max(1-(std::fabs(x1-a1)/b1),(double)0) << endl;
+													//cout << "calc of memb func of x2 " << max(1-(std::fabs(x2-a2)/b2),(double)0) << endl;
+                         	//mat_of_membership_function_value_per_coordinates[i][j][k-1]=max(1-(std::fabs(x-a)/b),(double)0);
+
+													//CALC OF BETA_1 et BETA_2 (adaptibility) && calc inst of membership_function
+													if(tab_value_by_pt[k]==0)
+													{
+														//cout << "point rouge" << endl;
+                            mat_of_adaptability_of_each_area[i][j][0]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}
+
+                        	if(tab_value_by_pt[k]==1)
+													{	
+														//cout << "point vert" << endl;
+                            mat_of_adaptability_of_each_area[i][j][1]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}
+												}
+												else if(tab[k][0]==1 && tab[k][1]<mat_of_areas[i][j][1] && tab[k][0]==(mat_of_areas[i][j][0]) && tab[k][1]>=(mat_of_areas[i][j][1]-1/L))
+												{
+													a1=(((double)j+1)-1)/(L-1);//car j varie entre 0 et L-1 au lieu de 1 et L
+                        	b1=1/(L-1);
+
+													a2=(((double)i+1)-1)/(L-1);//de mm que pour j, voir le commentaire ultérieur
+                        	b2=1/(L-1);
+
+													x1=tab[k][0];
+													x2=tab[k][1];
+
+													//cout << "calc of memb func of x1 " << max(1-(std::fabs(x1-a1)/b1),(double)0) << endl;
+													//cout << "calc of memb func of x2 " << max(1-(std::fabs(x2-a2)/b2),(double)0) << endl;
+                         	//mat_of_membership_function_value_per_coordinates[i][j][k-1]=max(1-(std::fabs(x-a)/b),(double)0);
+
+													//CALC OF BETA_1 et BETA_2 (adaptibility) && calc inst of membership_function
+													if(tab_value_by_pt[k]==0)
+													{
+														//cout << "point rouge" << endl;
+                            mat_of_adaptability_of_each_area[i][j][0]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}
+
+                        	if(tab_value_by_pt[k]==1)
+													{	
+														//cout << "point vert" << endl;
+                            mat_of_adaptability_of_each_area[i][j][1]+=max(1-(std::fabs(x1-a1)/b1),(double)0)*max(1-(std::fabs(x2-a2)/b2),(double)0);
+													}*/
+
+

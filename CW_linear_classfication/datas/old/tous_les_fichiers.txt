@@ -1,0 +1,5 @@
+comp.sys.ibm.pc.hardware
+comp.sys.mac.hardware
+script.sh
+script.sh~
+tous_les_fichiers.txt

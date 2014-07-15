@@ -1,0 +1,23 @@
+# I am a comment, and I want to say that the variable CC will be
+# the compiler to use.
+CC=g++
+# Hey!, I am comment number 2. I want to say that CFLAGS will be the
+# options I'll pass to the compiler.
+CFLAGS=-Wall -std=c++11 -o
+
+#default:make
+#all:make
+
+make:create_various_rotates_datas.cpp
+	$(CC) $(CFLAGS) change_previous_datas.exe create_various_rotates_datas.cpp
+#make:creation_jeu_de_donnees.cpp
+	#$(CC) $(CFLAGS) creation_jeu_de_donnees.exe creation_jeu_de_donnees.cpp
+
+##make:creation_jeu_donnee_bis.cpp
+	##$(CC) $(CFLAGS) creation_jeu_donnee_bis.exe creation_jeu_donnee_bis.cpp
+
+launch:change_previous_datas.exe
+	./change_previous_datas.exe output_bis
+
+clean:
+	rm *.exe

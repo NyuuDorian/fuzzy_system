@@ -1,0 +1,23 @@
+# I am a comment, and I want to say that the variable CC will be
+# the compiler to use.
+CC=g++
+# Hey!, I am comment number 2. I want to say that CFLAGS will be the
+# options I'll pass to the compiler.
+CFLAGS=-Wall -std=c++11 -lm -lpthread -lX11 -o
+
+#default:make
+#all:make
+
+make:analyse_everything.cpp
+	$(CC) $(CFLAGS) analyse_everything.exe analyse_everything.cpp
+
+launch:analyse_everything
+	./analyse_everything
+	#./iris_extraction_ayame.exe
+	#./iris_extraction.exe
+	#./analyse_everything.exe
+
+clean:
+	rm *.exe
+
+#g++ -o aaa test.cpp -lm -lpthread -lX11

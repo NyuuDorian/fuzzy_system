@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1400215378 source:/home/julien/Documents/Prog_C++/lab_logique_floue/main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<cmath>
+	<vector>
+

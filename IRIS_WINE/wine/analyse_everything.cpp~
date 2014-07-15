@@ -1,0 +1,288 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cmath>
+#include <vector>
+#include <cstdlib>
+
+using namespace std;
+
+#define K_MAX 5 //nombre darea MAX par cote
+#define K_MIN 2 //nombre MIN darea par cote
+#define NBRE_PTS 178 //nbre total de points
+#define NBRE_COORD 13 //nbre de coord par point
+#define NBRE_CLASSE 3 //nbre de classes differentes
+
+
+//MEANS OF NORMALIZATION
+//in order to normalize I am using Min-max normalization
+//vi'= (vi-min)/(max-min)*(new_max-new_min)+new_min ==> [0,1]
+
+//(other normalization) z-score normalization
+//vi'=(vi-mean)/SD
+//SD stands for Standard Deviation 
+
+
+
+//no need here values already normalized
+/*
+double get_value_normalized(double value_to_normalize, double max, double min, double new_max, double new_min)
+{
+	double value_normalized((value_to_normalize-min)/(max-min)*(new_max-new_min)+new_min);//cf Min-max normalization
+	return value_normalized;
+}*/
+
+double get_value_membership_function(double x, double k, double L)
+{
+	double value_membership(0), a(0), b(0);
+	a=(k-1)/(L-1);
+	b=1/(L-1);
+	value_membership=max((double)1-(std::fabs(x-a)/b),(double)0);
+	return value_membership;
+}
+
+
+//no need here because are already truncated
+/*double get_6_significative_num(double number_to_truncate)
+{
+	double new_num=number_to_truncate*pow(10,6), intpart;
+	double fractpart=modf (new_num , &intpart);
+	if(fractpart>=0.5) new_num=ceil(new_num);
+	else new_num=floor(new_num);
+	//cout << new_num << "\t";
+	new_num/=pow(10,6);
+	//cout << new_num << "\t";
+	return new_num;
+}*/
+
+
+//effectue automatiquement lincrementation de mat_of_coord, permet de faire une seule boucle propre
+void check_incrementation(int* mat_of_coord, int numero_coord, int K)
+{
+	if(numero_coord!=0)
+	{
+		if(mat_of_coord[numero_coord]==K) 
+		{
+			mat_of_coord[numero_coord-1]++;
+			mat_of_coord[numero_coord]=0;
+		}
+		check_incrementation(mat_of_coord, numero_coord-1, K);
+	}
+	//else 
+}
+
+//calc l'adaptability for each class in each area
+double calc_of_adaptability(double *mat_initial_coord_each_point, int* mat_of_coord_of_area, double K)
+{
+	double Multiply(1);
+	for(int i=0; i<NBRE_COORD; i++)
+	{
+		Multiply*=get_value_membership_function(mat_initial_coord_each_point[i], (double)mat_of_coord_of_area[i]+1, K);
+	}
+	return Multiply;
+}
+
+
+//allow to calc the rank to get for the matrix
+int calc_of_rank(int *mat_of_coord, int K)
+{
+	int Sum(0);
+	for(int i=0; i<NBRE_COORD; i++)
+	{
+			Sum+=(int)mat_of_coord[i]*(int)pow(K,NBRE_COORD-1-i);
+	}
+	return Sum;
+}
+
+
+//allow user to get the rank where we obtained the max
+int get_rank_of_max(double *adaptability)
+{
+	int rank(0);
+	double memories(0);
+	for(int i=0; i<NBRE_CLASSE+1; i++)
+	{
+		if(memories < adaptability[i])
+		{
+			rank=i;
+			memories=adaptability[i];
+		}
+	}
+	return rank;
+}
+
+int get_rank_of_second_max(int rank_of_max, double *adaptability)
+{
+	int rank_of_second_max(0);
+	double memories(0);
+	for(int i=0; i<NBRE_CLASSE+1; i++)
+	{
+		if(memories < adaptability[i] && i!=rank_of_max)
+		{
+			rank_of_second_max=i;
+			memories=adaptability[i];
+		}
+	}
+	return rank_of_second_max;
+}
+
+//allow user to know if value is unique or not
+bool isUnique(int rank, double* adaptability)
+{
+	double memories(adaptability[rank]);
+	//bool found(false);
+	for(int i=0; i<NBRE_CLASSE+1; i++)
+	{
+		if(memories == adaptability[i] && i!=rank) return false;
+	}
+	return true;
+}
+
+//user get the complete calc of CF
+double calc_of_CF(int rank_of_max, double* adaptability)
+{
+	double Sum_of_all(0), CF(0), second_max(0);
+	for(int i=0; i<NBRE_CLASSE+1; i++)
+	{
+		Sum_of_all+=adaptability[i];
+	}
+	
+	if(Sum_of_all!=0)
+	{
+		second_max=adaptability[get_rank_of_second_max(rank_of_max, adaptability)];
+		CF=(adaptability[rank_of_max]-second_max)/Sum_of_all;
+		return CF;
+	}
+	else return 0;
+}
+
+
+void remise_a_zero(int* mat_of_coord)
+{
+	for(int i=0; i<NBRE_COORD; i++)
+	{
+		mat_of_coord[i]=0;
+	}
+}
+
+
+//###########################################################################################################################################################################################
+
+int main()
+{
+	double mat_initial_coord[NBRE_PTS][NBRE_COORD]={0};//matrix gathering all the 4 coordinates NORMALIZED extracted from the file
+	int mat_initial_value_of_each_point[NBRE_PTS]={0}, mat_final_value_of_each_point[NBRE_PTS]={0};//matrix giving the class of each point
+	string str;	
+
+	ifstream fichier("test_writing.txt");
+  if(fichier)
+	{
+		fichier.seekg(0, ios::beg);//on se place au debut du fichier
+
+//on recupere toutes les donnees
+		for(int i=0; i<NBRE_PTS; i++)
+		{
+			string ligne;
+			getline(fichier, ligne); //on recupere ligne par ligne le fichier
+			size_t depart(0),found(-1);//ces marqueurs permettent de recuperer les indices de la ou sont placees les virgules
+			for(int j=0; j<NBRE_COORD; j++)//also found!=std::string::npos
+			{
+				found = ligne.find(',',found+1);
+
+//lecture fichier ayame10.dat
+				mat_initial_coord[i][j]=stod(ligne.substr(depart, found-depart));
+				
+				if(found!=string::npos) depart=found+1;
+			}
+			
+			mat_initial_value_of_each_point[i]=stoi(ligne.substr(depart));			
+
+		}
+  }
+  else
+  {
+      cout << "ERREUR: Impossible d'ouvrir le fichier en lecture." << endl;
+  }
+
+
+//4*[K_MAX] car on a des area en 4 dimension
+	//double mat_of_all_Gij_CFij[][(int)pow(K_MAX, NBRE_COORD)][2]=new double[K_MAX-K_MIN+1][(int)pow(K_MAX, NBRE_COORD)][2];
+	int* G = new int [(int) pow(K_MAX, NBRE_COORD)];
+	double* CF=new double[(int) pow(K_MAX, NBRE_COORD)]; 
+	//double mat_of_all_Gij_CFij[K_MAX-K_MIN+1][1595566][2]={0};
+
+	for(double K=K_MIN; K<=K_MAX; K++)
+	{
+		//int i(0), j(0), k(0), l(0);//ce seront les indices des area de 4 dimensions
+		int mat_of_coord[NBRE_COORD]={0};
+		while(mat_of_coord[0]!=K)
+		{
+			double adaptability[NBRE_CLASSE+1] ={0};
+			for(int m=0; m<NBRE_PTS; m++)
+			{
+
+//calc of ADAPTIBILITY
+//on selectionne ladaptibility de la classe mat_initial_value_of_each_point[m]
+				adaptability[mat_initial_value_of_each_point[m]]+=calc_of_adaptability(mat_initial_coord[m], mat_of_coord, K);
+			}
+	
+			if(isUnique(get_rank_of_max(adaptability), adaptability))
+			{
+				//mat_of_all_Gij_CFij[(int)K-2][calc_of_rank(mat_of_coord, (int)K)][0]=get_rank_of_max(adaptability);
+				//mat_of_all_Gij_CFij[(int)K-2][calc_of_rank(mat_of_coord, (int)K)][1]=calc_of_CF(get_rank_of_max(adaptability), adaptability);
+				G[calc_of_rank(mat_of_coord, (int)K)]=get_rank_of_max(adaptability);
+				CF[calc_of_rank(mat_of_coord, (int)K)]=calc_of_CF(get_rank_of_max(adaptability), adaptability);
+			}
+			else
+			{
+				//mat_of_all_Gij_CFij[(int)K-2][calc_of_rank(mat_of_coord, (int)K)][0]=0;
+				//mat_of_all_Gij_CFij[(int)K-2][calc_of_rank(mat_of_coord, (int)K)][1]=0;
+				G[calc_of_rank(mat_of_coord, (int)K)]=0;
+				CF[calc_of_rank(mat_of_coord, (int)K)]=0;
+			}
+
+			//cout << mat_of_coord[0] << mat_of_coord[1] << mat_of_coord[2] << mat_of_coord[3] << endl;
+			mat_of_coord[NBRE_COORD-1]++;
+			check_incrementation(mat_of_coord, NBRE_COORD-1, (int)K);
+			
+		}
+	
+	
+		int compteur_valeur_similaire(0);
+
+		for(int m=0; m<NBRE_PTS; m++)
+		{
+			double mat_of_all_alpha[NBRE_CLASSE+1]={0}; //replace double alpha1(0), alpha2(0), alpha3(0);
+
+			//int mat_of_coord[NBRE_COORD]={0};
+			remise_a_zero(mat_of_coord);
+
+
+			while(mat_of_coord[0]!=K)
+			{
+
+//CALC OF ALPHA[i] for each point
+	
+				mat_of_all_alpha[G[calc_of_rank(mat_of_coord, (int)K)]]=max(calc_of_adaptability(mat_initial_coord[m], mat_of_coord, K)*CF[calc_of_rank(mat_of_coord, (int)K)], mat_of_all_alpha[G[calc_of_rank(mat_of_coord, (int)K)]]);
+			
+
+				mat_of_coord[NBRE_COORD-1]++;
+				check_incrementation(mat_of_coord, NBRE_COORD-1, (int)K);
+			}
+
+
+
+			if(isUnique(get_rank_of_max(mat_of_all_alpha), mat_of_all_alpha)) mat_final_value_of_each_point[m]=get_rank_of_max(mat_of_all_alpha);
+			else mat_final_value_of_each_point[m]=0;
+
+			if(mat_final_value_of_each_point[m]==mat_initial_value_of_each_point[m]) compteur_valeur_similaire++;
+	
+		}
+
+		cout << "K = " << (int)K << " : \t" << (double)compteur_valeur_similaire*100/NBRE_PTS << " % " << endl;
+
+		
+	}
+
+  return EXIT_SUCCESS;
+}
