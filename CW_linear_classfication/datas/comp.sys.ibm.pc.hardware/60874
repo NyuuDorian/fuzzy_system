@@ -1,5 +1,5 @@
-From: kaw@slc1.UUCP (Kwame Workman)
-Subject: Re: WinCIM at 9600 baud
+From  kaw slc1 UUCP  Kwame Workman 
+Subject  Re  WinCIM at 9600 baud
 
-I've had similar problems downloading using WinCIM, I discovered that if I
-disabled data compression on my modem, it works fine.
+I ve had similar problems downloading using WinCIM  I discovered that if I
+disabled data compression on my modem  it works fine 

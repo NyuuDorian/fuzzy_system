@@ -1,10 +1,10 @@
-From: x90sanson@gw.wmich.edu
-Subject: What's the diff.between mouse.sys/com??
+From  x90sanson gw wmich edu
+Subject  What s the diff between mouse sys com  
 
-What's the difference between loading mouse.com in autoexec.bat and
-doing device=mouse.sys in config.sys??
+What s the difference between loading mouse com in autoexec bat and
+doing device mouse sys in config sys  
 
-which one is better?
+which one is better 
 
 Thanks a lot
 

@@ -1,13 +1,13 @@
-From: jcl@bdrc.bd.com (John C. Lusth)
-Subject: Kentucky Fried CMOS beats Hardees!
+From  jcl bdrc bd com  John C  Lusth 
+Subject  Kentucky Fried CMOS beats Hardees 
 
-Hey folks.
+Hey folks 
 
-Is it possible to short out your CMOS chip?  I think mine is fried.
-These are the symptoms...
+Is it possible to short out your CMOS chip   I think mine is fried 
+These are the symptoms   
 
-I have to do the following to get my computer (a Gateway 486DX33)
-to boot...
+I have to do the following to get my computer  a Gateway 486DX33 
+to boot   
 
     Turn the power off
 
@@ -19,22 +19,22 @@ to boot...
 
     Set up the CMOS
 
-    Exit the setup with [F10]  (phoenix bios)
+    Exit the setup with [F10]   phoenix bios 
 
     Ignore the diskette 0 seek error and press [F1]
 
-The computer then boots normally.  Both hard drives are accessible
-but the floppy drives are not.
+The computer then boots normally   Both hard drives are accessible
+but the floppy drives are not 
 
-I can back up over the network and such, but if I need to reboot,
-I have to turn off the computer and repeat the steps above.  If I
-simply <Ctl>-<Alt>-<Del>, the computer hangs after the memory test.
+I can back up over the network and such  but if I need to reboot 
+I have to turn off the computer and repeat the steps above   If I
+simply  Ctl   Alt   Del   the computer hangs after the memory test 
 
-Does this sound like the CMOS chip is fried?  Can I buy another one?
-Where?
+Does this sound like the CMOS chip is fried   Can I buy another one 
+Where 
 
-Thank you for your kind attention.
+Thank you for your kind attention 
 
 john
--- 
-John C. Lusth, Becton Dickinson Research Center, RTP, NC, USA  jcl@bdrc.bd.com
+   
+John C  Lusth  Becton Dickinson Research Center  RTP  NC  USA  jcl bdrc bd com
