@@ -1,11 +1,11 @@
-From  ELURONA YaleVM YCC Yale Edu  R  Elul 
-Subject  Help Wanted Loading Logitech Scanman Driver in High memory
+from  elurona yalevm ycc yale edu  r  elul 
+subject  help wanted loading logitech scanman driver in high memory
 
-I am having troubleloading my Logitech Scanman Driver  latest version  into
-high memory with the devicehigh command in MSDOS 6  It gives me an
- invalid parameters  message  Is it necessary to change some of the scanner
+i am having troubleloading my logitech scanman driver  latest version  into
+high memory with the devicehigh command in msdos 6  it gives me an
+ invalid parameters  message  is it necessary to change some of the scanner
 driver parameters when loading high 
-Any help would be appreciated
+any help would be appreciated
  
  
-Ronel
+ronel

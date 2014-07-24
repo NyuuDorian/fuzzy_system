@@ -48,7 +48,8 @@ for i, elt in enumerate(files):
                 contenu_file_ibm=contenu_file_ibm.replace("^"," ")
                 contenu_file_ibm=contenu_file_ibm.replace("|"," ")
                 contenu_file_ibm=contenu_file_ibm.replace("@"," ")
-
+                contenu_file_ibm=contenu_file_ibm.lower()
+                #contenu_file_ibm=contenu_file_ibm.replace(""," ")
 
         with open("/home/julien/fuzzy_system/CW_linear_classfication/datas/comp.sys.ibm.pc.hardware/"+elt, "w") as new_file_ibm:
                 new_file_ibm.write(contenu_file_ibm)
@@ -96,6 +97,8 @@ for i, elt in enumerate(files):
                 contenu_file_mac=contenu_file_mac.replace("^"," ")
                 contenu_file_mac=contenu_file_mac.replace("|"," ")
                 contenu_file_mac=contenu_file_mac.replace("@"," ")
+                contenu_file_mac=contenu_file_mac.lower()
+
         with open("/home/julien/fuzzy_system/CW_linear_classfication/datas/comp.sys.mac.hardware/"+elt, "w") as new_file_mac:
                 new_file_mac.write(contenu_file_mac)
 

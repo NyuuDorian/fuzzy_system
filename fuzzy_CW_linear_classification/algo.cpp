@@ -10,9 +10,29 @@
 
 using namespace std;
 
-//#define PHI 0 
+/*#define PHI 0 
+#define ETA 0
+#define A 1*/
 
-#define NBRE_ITERATION 5
+//#define NBRE_POINTS 2000
+//#define NBRE_COORD 8
+#define NBRE_ITERATION 10
+
+
+/*
+
+double norme(x)
+{
+	double NORME_X(0);
+	return NORME_X;
+}
+
+double** produit_matriciel()
+{
+	
+}*/
+
+//MU=calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
 
 //calculate the value of the membership value
 double get_value_membership_function(double x, double k, double L)
@@ -24,8 +44,6 @@ double get_value_membership_function(double x, double k, double L)
 	return value_membership;
 }
 
-
-//MU=calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
 
 double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double alpha_i, int y_i, int dim)
 {
@@ -144,7 +162,17 @@ else
 		cout << NBRE_CLASSES << endl; 
 	}
 	else cout << "Cannot open the file to read" << endl;
+	//x_i belongs to R^d
+	//y_i belongs to {-1,+1}
+	//w_i+1=w_i+alpha_i*y_i*x_i
 
+	//alpha_i = max( (1 - y_i(w_i . x_i)) / ||x_i||^2 , (double)0)
+
+	//Sigma belongs to R^d_x_d
+
+	//MU_i+1 = MU_i * alpha_i * y_i * SIGMA_i * x_i
+
+	//double Φ=PHI, η=ETA; //initial parameters
 	double phi=1; //confidence parameter φ = Φ^(-1)(η); ou Φ^(-1) est la fonction inverse de Φ
 	double a = 0.1; //initial variance parameter, a>0
 
@@ -238,49 +266,79 @@ else
 		//cout << inverse_SIGMA[j] << endl;
 	}
 
+
 ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
 
+	//define the number of divided areas for the fuzzy classification, here varies between 2~7
+	for(int K=2; K<8; K++)
+	{
+		/*
+		double*** matrice_of_all_fuzzy_rules= new double*[NBRE_POINTS][NBRE_COORD];
+		for(int i=0; i<K; i++) matrice_of_all_fuzzy_rules[i]=new double[K];*/
+		double*** matrice_of_all_fuzzy_rules= new double*[NBRE_POINTS][NBRE_COORD];
+		for(int i=0; i<K; i++) matrice_of_all_fuzzy_rules[i]=new double[K];
+
 	for(int i=0; i<NBRE_ITERATION; i++)
 	{
-		for(int j=0; j<NBRE_POINTS; j++)
+		for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 		{
-//			cout << j << endl;
-			
-			//TODO LIST update alpha ==> DONE
-//			cerr << j << "\t";
 			ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
 
 			SIGMA=calculate_inverse_SIGMA_i(inverse_SIGMA, NBRE_COORD);//inverse of inverse gives natural
+
 			
 			MU=calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
 
 			inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(matrice_of_all_coord[i], NBRE_COORD), ALPHA, phi, NBRE_COORD);
+		}
 
 			int counter_correct_classification(0);
 			double classifier(0);
 			//int minus_pos(0), maxi_pos(0), null_pos(0);			
 
-			for( int k=0; k<NBRE_POINTS; k++ )
+			for( int k=i*NBRE_POINTS/10+NBRE_POINTS/10; k<i*NBRE_POINTS/10+2*NBRE_POINTS/10; k++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
 	    {
-	      classifier = 0;
+				int tmp(0);
+				if(k<NBRE_POINTS) tmp=k;
+				else tmp=k-NBRE_POINTS;
+
+				classifier = 0;
+	      for( int l=0; l<NBRE_COORD; l++ ){
+	        classifier += matrice_of_all_coord[tmp][l] * MU[l];
+	      }
+				//cout << k << " " << classifier << endl;
+      	if( classifier > 0 ) matrice_of_all_prediction_value[tmp] = 1;
+      	else if (classifier < 0 ) matrice_of_all_prediction_value[tmp] = -1;
+   			else {matrice_of_all_prediction_value[tmp]=0; /*cout << "TIC ";*/}
+      	if( matrice_of_all_prediction_value[tmp]==matrice_of_all_value[tmp] ) counter_correct_classification++;
+
+
+	      /*classifier = 0;
 	      for( int l=0; l<NBRE_COORD; l++ ){
 	        classifier += matrice_of_all_coord[k][l] * MU[l];
 	      }
 				//cout << k << " " << classifier << endl;
       	if( classifier > 0 ) matrice_of_all_prediction_value[k] = 1;
       	else if (classifier < 0 ) matrice_of_all_prediction_value[k] = -1;
-   			else {matrice_of_all_prediction_value[k]=0; /*cout << "TIC ";*/}
-      	if( matrice_of_all_prediction_value[k]==matrice_of_all_value[k] ) counter_correct_classification++;
+   			else {matrice_of_all_prediction_value[k]=0; }
+      	if( matrice_of_all_prediction_value[k]==matrice_of_all_value[k] ) counter_correct_classification++;*/
+				//else if(matrice_of_all_prediction_value[k]==-1) minus_pos++;
+				//else if(matrice_of_all_prediction_value[k]==1) maxi_pos++;
+				//else if(matrice_of_all_prediction_value[k]==0) null_pos++;
     	}
-			
-		if(j==NBRE_POINTS-1) test_result << j << " " << (double)counter_correct_classification*100/NBRE_POINTS << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-		if(j==NBRE_POINTS-1) cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/NBRE_POINTS << " %" << endl;
+	
+			//if(j<50) cout << counter_correct_classification << endl ;
+		
+		test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+		cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
 
-		}
+
+
+
 	}
-
+	}
 }
 else cout << "cannot write on test_result" << endl;
 
