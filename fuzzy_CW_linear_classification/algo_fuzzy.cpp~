@@ -1,4 +1,9 @@
+//TODO LIST HAVE TO MAKE BEGINING VALUES RANDOMLY PICKED UP FROM -1 to 1
+//TODO LIST HAVE TO MAKE A SHUFFLE OF THE DATAS
+
 //GET THE SIGN TO GET THE CLASS ! :D 
+
+//all includes, anemspace and #define values
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +21,10 @@ using namespace std;
 
 //#define NBRE_POINTS 2000
 //#define NBRE_COORD 8
-#define NBRE_ITERATION 10
+#define NBRE_ITERATION 5
+
+
+//ALL FUNCTION DEFINED HERE
 
 
 //calculate the value of the membership value
@@ -118,6 +126,10 @@ double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 //	cout << ALPHA << endl;
 	return ALPHA;
 }
+
+
+
+//BEGINING OF THE PROGRAMME
 
 
 
@@ -238,35 +250,102 @@ if(test_result)
 			inverse_SIGMA[i]=1/a;
 		}
 
+//TODO LIST initiliser une liste de longueur (int)pow(K,NBRE_COORD) qui contiendra toutes les valeurs possibles ==> DONE
+		double** matrix_for_calc_of_membership_func =	new double*[(int)pow(K,NBRE_COORD)];
+		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) matrix_for_calc_of_membership_func[z]=new double[NBRE_COORD];
+		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) 
+		{
+			int tmp=z;
+			for(int y=0; y<NBRE_COORD; y++)
+			{
+				matrix_for_calc_of_membership_func[z][y]=tmp/(int)pow(K, NBRE_COORD-1-y);
+				//cout << tmp/(int)pow(K, NBRE_COORD-1-y) << "\t";
+				int coeff(tmp/(int)pow(K, NBRE_COORD-1-y));
+				tmp-=coeff*(int)pow(K, NBRE_COORD-1-y);
+			}
+			//cout << endl;
+		}	
+
 
 		for(int i=0; i<NBRE_ITERATION; i++)
+		
 		{
 			for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 			{
 
 //calc of vector membership value of vector x
 				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
+			
+
+
 				//initialisation a 1
 				for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
 				{
 					membership_value_of_x[k]=1;
 					for(int l=0; l<NBRE_COORD; l++)
 					{
-						membership_value_of_x[k]*=membership_function(matrice_of_all_coord[j][k]);//membership function of each coordinates
+						//get_value_membership_function(double x, double k, double L)
+						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][k], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
 					}				
 				}
 
 //now improve mean and variance using membership_value_of_x
-//TODO LIST few modifications of the functions used below and defined a little in the upper part 
+//TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
 				ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
 				SIGMA=calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD));//inverse of inverse gives natural
 				MU=calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[j], (int)pow(K,NBRE_COORD));
 				inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD)), ALPHA, phi, (int)pow(K,NBRE_COORD));
 
 			}
-		}
 
+//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
+			int counter_correct_classification(0);
+			double classifier(0);
+			//int minus_pos(0), maxi_pos(0), null_pos(0);			
+
+			for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+	    {
+
+//calc of vector membership value of vector x
+				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
+
+				//initialisation a 1
+				for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
+				{
+					membership_value_of_x[k]=1;
+					for(int l=0; l<NBRE_COORD; l++)
+					{
+						//get_value_membership_function(double x, double k, double L)
+						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][k], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
+					}				
+				}
+
+				//int tmp(0);
+				//if(k<NBRE_POINTS) tmp=k;
+				//else tmp=k-NBRE_POINTS;
+
+				classifier = 0;
+	      for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
+	        classifier += membership_value_of_x[l] * MU[l];
+	      }
+				//cout << k << " " << classifier << endl;
+      	if( classifier > 0 ) matrice_of_all_prediction_value[j] = 1;
+      	else if (classifier < 0 ) matrice_of_all_prediction_value[j] = -1;
+   			else {matrice_of_all_prediction_value[j]=0; }
+      	if( matrice_of_all_prediction_value[j]==matrice_of_all_value[j] ) counter_correct_classification++;
+
+
+	    }
+	
+				//if(j<50) cout << counter_correct_classification << endl ;
 		
+			test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
+
+
+
+
+		}
 		
 	}
 }

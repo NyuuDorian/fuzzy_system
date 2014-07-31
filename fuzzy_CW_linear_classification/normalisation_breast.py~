@@ -12,9 +12,9 @@ with open("breast-cancer-wisconsin_bis.data", "r") as mon_fichier_lecture:
 	i=0
 	for i, elt in enumerate(tab):
 		#print(int(elt))
-		if(i>2 and int(tab[i])>10):
+		if(i>2 && int(tab[i])>10):
 			del tab[i]
-		if(i>2 and (i-3)%10=0):
+		if(i>2 && (i-3)%10=0):
 			tab[i]=str((int(tab[i])-1)/9)
 		i++
 
