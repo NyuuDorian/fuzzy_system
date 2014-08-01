@@ -28,7 +28,7 @@ using namespace std;
 
 //#define NBRE_POINTS 2000
 //#define NBRE_COORD 8
-#define NBRE_ITERATION 5
+#define NBRE_ITERATION 7
 
 
 
@@ -263,8 +263,9 @@ if(test_result)
 {
 
 	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7
-	for(int K=2; K<4; K++)
+	for(int K=2; K<8; K++)
 	{
+		cout << "K="<< K << endl;
 		double* MU=new double[(int)pow(K,NBRE_COORD)]; //consequent_real_value
 		double* SIGMA=new double[(int)pow(K,NBRE_COORD)];		
 		double* inverse_SIGMA=new double[(int)pow(K,NBRE_COORD)];
@@ -280,8 +281,8 @@ if(test_result)
 		}
 
 //TODO LIST initiliser une liste de longueur (int)pow(K,NBRE_COORD) qui contiendra toutes les valeurs possibles ==> DONE
-		double** matrix_for_calc_of_membership_func =	new double*[(int)pow(K,NBRE_COORD)];
-		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) matrix_for_calc_of_membership_func[z]=new double[NBRE_COORD];
+		int** matrix_for_calc_of_membership_func =	new int*[(int)pow(K,NBRE_COORD)];
+		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) matrix_for_calc_of_membership_func[z]=new int[NBRE_COORD];
 		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) 
 		{
 			int tmp=z;
@@ -314,7 +315,7 @@ if(test_result)
 					for(int l=0; l<NBRE_COORD; l++)
 					{
 						//get_value_membership_function(double x, double k, double L)
-						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][k], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
+						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
 					}				
 				}
 
@@ -325,15 +326,22 @@ if(test_result)
 				MU=calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[j], (int)pow(K,NBRE_COORD));
 				inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD)), ALPHA, phi, (int)pow(K,NBRE_COORD));
 
+				delete membership_value_of_x;
 			}
 
 //TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
+//here we calculate the inference of the test datas to know if the classifier is effective
 			int counter_correct_classification(0);
-			double classifier(0);
-			//int minus_pos(0), maxi_pos(0), null_pos(0);			
+			double classifier(0);			
 
 			for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
 	    {
+
+//have to change every j with tmp_bis
+				int tmp_bis(0);
+				if(j<NBRE_POINTS) tmp_bis=j;
+				else tmp_bis=j-NBRE_POINTS;
+
 
 //calc of vector membership value of vector x
 				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
@@ -345,25 +353,22 @@ if(test_result)
 					for(int l=0; l<NBRE_COORD; l++)
 					{
 						//get_value_membership_function(double x, double k, double L)
-						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][k], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
+						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
 					}				
 				}
-
-				//int tmp(0);
-				//if(k<NBRE_POINTS) tmp=k;
-				//else tmp=k-NBRE_POINTS;
 
 				classifier = 0;
 	      for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
 	        classifier += membership_value_of_x[l] * MU[l];
 	      }
 				//cout << k << " " << classifier << endl;
-      	if( classifier > 0 ) matrice_of_all_prediction_value[j] = 1;
-      	else if (classifier < 0 ) matrice_of_all_prediction_value[j] = -1;
-   			else {matrice_of_all_prediction_value[j]=0; }
-      	if( matrice_of_all_prediction_value[j]==matrice_of_all_value[j] ) counter_correct_classification++;
+      	if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
+      	else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
+   			else {matrice_of_all_prediction_value[tmp_bis]=0; }
+      	if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
 
 
+				delete membership_value_of_x;
 	    }
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
@@ -375,6 +380,12 @@ if(test_result)
 
 
 		}
+
+
+		delete matrix_for_calc_of_membership_func;
+		delete MU;
+		delete SIGMA;
+		delete inverse_SIGMA;
 		
 	}
 }
