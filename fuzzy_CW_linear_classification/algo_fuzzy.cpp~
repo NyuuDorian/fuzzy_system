@@ -19,6 +19,8 @@
 #include <ctgmath>
 #include <vector>
 #include <cstdlib>
+#include <ctime>
+#include <algorithm>
 
 using namespace std;
 
@@ -141,10 +143,47 @@ double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 }
 
 
+//permet de melanger de maniere aleatoire les donnees recue creant ainsi des donnees totalement random
+void randomly_mix(double** matrice_of_all_coord, int* matrice_of_all_value, int NBRE_POINTS, int NBRE_COORD)
+{
+	vector< vector<double> > matrice_of_all_coord_tmp;
+	vector<int> matrice_of_all_value_tmp;
+	int nb_rand(0), nbre_datas(NBRE_POINTS);
 
+	for(int i=0; i<NBRE_POINTS; i++)
+	{
+		vector<double> matrice_of_all_coord_tmp_bis;
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			matrice_of_all_coord_tmp_bis.push_back(matrice_of_all_coord[i][j]);
+		}
+		matrice_of_all_coord_tmp.push_back(matrice_of_all_coord_tmp_bis);
+		matrice_of_all_value_tmp.push_back(matrice_of_all_value[i]);
+	}
 
+	for(int i=0; i<NBRE_POINTS; i++)
+	{
+		nb_rand = rand() % nbre_datas;
+		nbre_datas--;
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			matrice_of_all_coord[i][j]=matrice_of_all_coord_tmp[nb_rand][j];
+		}
+		matrice_of_all_value[i]=matrice_of_all_value_tmp[nb_rand];
+		matrice_of_all_coord_tmp.erase(matrice_of_all_coord_tmp.begin()+nb_rand);
+		matrice_of_all_value_tmp.erase(matrice_of_all_value_tmp.begin()+nb_rand);
+	}
 
-
+//check the new matrix created ==> seems OK
+	/*for(int i=0; i<NBRE_POINTS; i++)
+	{
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			cout << matrice_of_all_coord[i][j] << "\t";
+		}
+		cout << matrice_of_all_value[i] << endl;
+	}*/
+}
 
 
 
@@ -258,17 +297,46 @@ else
   }
 
 
+//check the matrix outputed ==> SEEMS OK
+	/*for(int i=0; i<NBRE_POINTS; i++)
+	{
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			cout << matrice_of_all_coord[i][j] << "\t";
+		}
+		cout << matrice_of_all_value[i] << endl;
+	}*/
+
+
+//mix randomly the datas
+	srand(time(0));
+	//randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+
+//check the matrix outputed after applying randomly_mixed function
+	for(int i=0; i<NBRE_POINTS; i++)
+	{
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			cout << matrice_of_all_coord[i][j] << "\t";
+		}
+		cout << matrice_of_all_value[i] << endl;
+	}
+
+
+
+
 ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
 
 	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7
-	for(int K=2; K<8; K++)
+	for(int K=2; K<4; K++)
 	{
 		cout << "K="<< K << endl;
 		double* MU=new double[(int)pow(K,NBRE_COORD)]; //consequent_real_value
 		double* SIGMA=new double[(int)pow(K,NBRE_COORD)];		
 		double* inverse_SIGMA=new double[(int)pow(K,NBRE_COORD)];
+		//cout << (int)pow(K,NBRE_COORD) << endl;
 
 
 //initiliser MU et SIGMA avec des valeurs aleatoires entre -1 et 1, (eventuellement eviter le 0 ? pour la diagonale de SIGMA)
@@ -282,7 +350,7 @@ if(test_result)
 
 //TODO LIST initiliser une liste de longueur (int)pow(K,NBRE_COORD) qui contiendra toutes les valeurs possibles ==> DONE
 		int** matrix_for_calc_of_membership_func =	new int*[(int)pow(K,NBRE_COORD)];
-		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) matrix_for_calc_of_membership_func[z]=new int[NBRE_COORD];
+		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) matrix_for_calc_of_membership_func[z]=new int[NBRE_COORD];//initialisation
 		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) 
 		{
 			int tmp=z;
@@ -297,8 +365,7 @@ if(test_result)
 		}	
 
 
-		for(int i=0; i<NBRE_ITERATION; i++)
-		
+		for(int i=0; i<NBRE_ITERATION; i++)		
 		{
 			for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 			{
@@ -316,7 +383,8 @@ if(test_result)
 					{
 						//get_value_membership_function(double x, double k, double L)
 						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)matrix_for_calc_of_membership_func[k][l], (double)K);//membership function of each coordinates
-					}				
+					}
+					if(membership_value_of_x[k]!=0 and K==2) cout << k << " " << membership_value_of_x[k] << endl;				
 				}
 
 //now improve mean and variance using membership_value_of_x
@@ -385,7 +453,7 @@ if(test_result)
 		delete matrix_for_calc_of_membership_func;
 		delete MU;
 		delete SIGMA;
-		double* inverse_SIGMA
+		delete inverse_SIGMA;
 		
 	}
 }

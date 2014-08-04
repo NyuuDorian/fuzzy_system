@@ -46,7 +46,6 @@ with open("breast-cancer-wisconsin.data", "r") as mon_fichier_lecture:
 	
 	#contenu=" ".join(tab)
 	#print(contenu.replace(","," "))
-#with open("breast_cancer_wisconsin_normalized.txt", "w") as mon_fichier_ecriture:
 with open("breast_cancer_wisconsin_normalized_2.txt", "w") as mon_fichier_ecriture:
 	#mon_fichier_ecriture.write("Premier test d'écriture dans un fichier via Python")
 	mon_fichier_ecriture.write("699\n")

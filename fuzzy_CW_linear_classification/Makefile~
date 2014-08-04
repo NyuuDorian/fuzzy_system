@@ -12,7 +12,8 @@ make:algo_fuzzy.cpp
 	$(CC) $(CFLAGS) algo_fuzzy.exe algo_fuzzy.cpp
 
 launch:algo_fuzzy.exe
-	./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
+	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
+	./algo_fuzzy.exe breast_cancer_wisconsin_normalized
 
 clean:
 	rm *.exe
