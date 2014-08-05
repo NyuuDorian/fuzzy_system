@@ -13,6 +13,7 @@ make:algo_fuzzy.cpp
 
 launch:algo_fuzzy.exe
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
+	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug
 	./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2
 
 clean:

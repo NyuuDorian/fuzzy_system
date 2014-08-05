@@ -7,6 +7,7 @@
 #include <ctgmath>
 #include <vector>
 #include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -121,6 +122,48 @@ double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 	ALPHA=max(GAMMA, (double)0);
 //	cout << ALPHA << endl;
 	return ALPHA;
+}
+
+//permet de melanger de maniere aleatoire les donnees recue creant ainsi des donnees totalement random
+void randomly_mix(double** matrice_of_all_coord, int* matrice_of_all_value, int NBRE_POINTS, int NBRE_COORD)
+{
+	vector< vector<double> > matrice_of_all_coord_tmp;
+	vector<int> matrice_of_all_value_tmp;
+	int nb_rand(0), nbre_datas(NBRE_POINTS);
+
+	for(int i=0; i<NBRE_POINTS; i++)
+	{
+		vector<double> matrice_of_all_coord_tmp_bis;
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			matrice_of_all_coord_tmp_bis.push_back(matrice_of_all_coord[i][j]);
+		}
+		matrice_of_all_coord_tmp.push_back(matrice_of_all_coord_tmp_bis);
+		matrice_of_all_value_tmp.push_back(matrice_of_all_value[i]);
+	}
+
+	for(int i=0; i<NBRE_POINTS; i++)
+	{
+		nb_rand = rand() % nbre_datas;
+		nbre_datas--;
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			matrice_of_all_coord[i][j]=matrice_of_all_coord_tmp[nb_rand][j];
+		}
+		matrice_of_all_value[i]=matrice_of_all_value_tmp[nb_rand];
+		matrice_of_all_coord_tmp.erase(matrice_of_all_coord_tmp.begin()+nb_rand);
+		matrice_of_all_value_tmp.erase(matrice_of_all_value_tmp.begin()+nb_rand);
+	}
+
+//check the new matrix created ==> seems OK
+	/*for(int i=0; i<NBRE_POINTS; i++)
+	{
+		for(int j=0; j<NBRE_COORD; j++)
+		{
+			cout << matrice_of_all_coord[i][j] << "\t";
+		}
+		cout << matrice_of_all_value[i] << endl;
+	}*/
 }
 
 
@@ -286,6 +329,12 @@ else
 		calculate_MU_i_plus_1();
 		calculate_inverse_SIGMA_i_plus_1();
 	}*/
+
+//mix randomly the datas
+	srand(time(0));
+	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+
+
 
 ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)

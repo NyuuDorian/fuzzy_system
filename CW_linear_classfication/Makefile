@@ -19,7 +19,8 @@ launch:algo.exe
 	#./algo.exe 5
 	#./algo.exe output_bis_2
 	#./algo.exe test1 2>err.txt
-	./algo.exe test2 2>err2.txt
+	#./algo.exe test2 2>err2.txt
+	./algo.exe 7 2>err2.txt
 
 clean:
 	rm *.exe
