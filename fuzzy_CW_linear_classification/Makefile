@@ -15,6 +15,9 @@ launch:algo_fuzzy.exe
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug
 	./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2
+	./algo_fuzzy.exe abalone_normalized
+	./algo_fuzzy.exe transfusion_normalized
+	./algo_fuzzy.exe pima-indians-diabetes_normalized
 
 clean:
 	rm *.exe

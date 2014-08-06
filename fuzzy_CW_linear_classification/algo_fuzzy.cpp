@@ -30,7 +30,7 @@ using namespace std;
 
 //#define NBRE_POINTS 2000
 //#define NBRE_COORD 8
-#define NBRE_ITERATION 7
+#define NBRE_ITERATION 4
 
 
 
@@ -333,10 +333,14 @@ if(test_result)
 	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7
 	for(int K=2; K<4; K++)
 	{
+		double moyenne_pourcentage(0);
+
 		cout << "K="<< K << endl;
 		double* MU=new double[(int)pow(K,NBRE_COORD)]; //consequent_real_value
 		double* SIGMA=new double[(int)pow(K,NBRE_COORD)];		
 		double* inverse_SIGMA=new double[(int)pow(K,NBRE_COORD)];
+
+		for(int i=0; i<(int)pow(K,NBRE_COORD); i++) MU[i]=0;
 		//cout << (int)pow(K,NBRE_COORD) << endl;
 
 
@@ -368,7 +372,8 @@ if(test_result)
 
 		for(int i=0; i<NBRE_ITERATION; i++)		
 		{
-			for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
+			//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
+			for(int j=i*100; j<i*100+100; j++)
 			{
 
 //calc of vector membership value of vector x
@@ -404,7 +409,8 @@ if(test_result)
 			int counter_correct_classification(0);
 			double classifier(0);			
 
-			for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+			//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+			for( int j=i*100+100; j<i*100+2*100; j++ )
 	    {
 
 //have to change every j with tmp_bis
@@ -443,10 +449,14 @@ if(test_result)
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
 		
-			test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
+			//test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
+			test_result << (double)counter_correct_classification*100/100 << " %" << endl;
+			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
 
 
+			//moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
+			moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 
 
 		}
@@ -456,12 +466,15 @@ if(test_result)
 		delete MU;
 		delete SIGMA;
 		delete inverse_SIGMA;
+
+
+		cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;
 		
 	}
 }
 else cout << "cannot write on test_result" << endl;
 
-
+	
 
 
 	return EXIT_SUCCESS;

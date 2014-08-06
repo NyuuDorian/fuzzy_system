@@ -1,0 +1,53 @@
+#!/usr/bin/python3.4
+# -*-coding:Utf-8 -*-
+
+import re
+
+with open("transfusion.data", "r") as mon_fichier_lecture: 
+	contenu = mon_fichier_lecture.read()
+	#contenu=contenu.replace("?","1")
+	tab=contenu.split("\n")
+	contenu=",".join(tab)
+	tab=contenu.split(",")
+	i=0
+	j=0
+	tab_min=[float(tab[0]),float(tab[1]),float(tab[2]),float(tab[3])]
+	tab_max=[float(tab[0]),float(tab[1]),float(tab[2]),float(tab[3])]
+	for i, elt in enumerate(tab):
+		#tmp_min=elt
+		if elt!='' and i%5!=4:
+			if tab_min[i%5]>float(elt):
+				tab_min[i%5]=float(elt)
+			if tab_max[i%5]<float(elt):
+				tab_max[i%5]=float(elt)
+
+	#print(tmp_min)
+	#print(tmp_max)
+	
+	for i, elt in enumerate(tab):
+		if(elt!=''):
+			if(i%5!=4):
+				tab[i]=str((int(tab[i])-tab_min[i%5])/(tab_max[i%5]-tab_min[i%5])*(1-0)+0)
+
+	
+	#contenu=" ".join(tab)
+	#print(contenu.replace(","," "))
+#with open("breast_cancer_wisconsin_normalized.txt", "w") as mon_fichier_ecriture:
+with open("transfusion.txt", "w") as mon_fichier_ecriture:
+	#mon_fichier_ecriture.write("Premier test d'écriture dans un fichier via Python")
+	mon_fichier_ecriture.write("748\n")
+	mon_fichier_ecriture.write("4\n")
+	mon_fichier_ecriture.write("2\n")
+	for i, elt in enumerate(tab):
+		if(i%5==0 and i!=0):
+			mon_fichier_ecriture.write("\n")
+		mon_fichier_ecriture.write(str(i%5))
+		mon_fichier_ecriture.write(" : ")
+		mon_fichier_ecriture.write(tab[i])
+		mon_fichier_ecriture.write("\t")
+		
+#print(contenu)
+
+#mon_fichier_lecture.close()
+#mon_fichier_ecriture.close()
+

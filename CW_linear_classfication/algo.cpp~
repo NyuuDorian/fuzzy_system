@@ -42,11 +42,18 @@ double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double
 	{
 		//if(X_i[j]!=0) cout << j << "\tinit_new_MU " << new_MU[j] << "\tnew_MU_calc ";
 		new_MU[j]=MU_i[j]+alpha_i*y_i*SIGMA_i[j]*X_i[j];
+		
+		//cerr << "coord " << j << "\t" << "MU_i " << MU_i[j] << "\t" << "alpha " << alpha_i << "\t" << "sign " << y_i << "\t" << "SIGMA_i " << SIGMA_i[j] << "\t" << "X_i" << X_i[j] << "\t" ;
+
+
 		/*if(X_i[j]!=0)
 		{
 			//cout << new_MU[j] << "\tMU " << MU_i[j] << "\tSIGMA " << SIGMA_i[j] << "\tX_i " << X_i[j] << "\talpha_i " << alpha_i << "\ty_i " << y_i << endl; //HELP to detect the error
 		}*/
 	}
+
+	//cerr << "\n";
+
 	return new_MU;
 }
 
@@ -90,9 +97,12 @@ double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 	for(int j=0; j<dim; j++)
 	{
 		M_i+=x_i[j]*MU_i[j];
+//BEWARE this cerr helps for debugging abalone ONLY
+		//cerr << "x_i " << x_i[j] << "\t" << "MU_i " << MU_i[j] << "\t";
 	}
 	M_i*=y_i;
-//	cerr << "M_i " << M_i << "\t";
+	//cerr << "\n";
+	//cerr << "M_i " << M_i << "\t";
 
 //V_i=tranposee_x_i*SIGMA_i*x_i;
 	for(int j=0; j<dim; j++)
@@ -101,15 +111,15 @@ double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 	}
 	if(V_i==0) V_i=0.00000001;
 
-//	cerr << "V_i " << V_i << "\t";
+	//cerr << "V_i " << V_i << "\t";
 
-//	double tmp((1+2*PHI*M_i ) - (8 * PHI * (M_i -PHI*V_i )));
+	//double tmp((1+2*PHI*M_i ) - (8 * PHI * (M_i -PHI*V_i )));
 
 	GAMMA=( -(1+2*PHI*M_i) + sqrt( pow(1+2*PHI*M_i, 2 ) - (8 * PHI * (M_i -PHI*V_i )) ))/(4*PHI*V_i);
 	
 
-//	cerr << "tmp " << tmp << "\t";
-//	cerr << "GAMMA " << GAMMA << endl;
+	//cerr << "tmp " << tmp << "\t";
+	//cerr << "GAMMA " << GAMMA << endl;
 
 	return GAMMA;
 }
@@ -221,7 +231,8 @@ else
 	int* matrice_of_all_prediction_value= new int[NBRE_POINTS];//value -1 or +1
 	bool can_read_next(true);
 
-	for(int i=0; i<NBRE_POINTS; i++) matrice_of_all_coord[i]=new double[NBRE_COORD]; 
+	for(int i=0; i<NBRE_POINTS; i++) matrice_of_all_coord[i]=new double[NBRE_COORD];
+	for(int i=0; i<NBRE_COORD; i++) MU[i]=0; 
 
 //TODO LIST INITIATE matrice_of_all_coord ==> DONE
 //TODO LIST INITIATE matrice_of_all_value ==> DONE
@@ -330,6 +341,13 @@ else
 		calculate_inverse_SIGMA_i_plus_1();
 	}*/
 
+//mix randomly the datas
+	srand(time(0));
+	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+
+	double moyenne_pourcentage(0);
+
+
 ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
@@ -341,7 +359,8 @@ if(test_result)
 //			cout << j << endl;
 			
 			//TODO LIST update alpha ==> DONE
-//			cerr << j << "\t";
+			cerr << j << "\t";
+
 			ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
 			//if(j<10) cout << ALPHA << endl;
 			//cout << j << "\t" << ALPHA << endl;
@@ -427,7 +446,7 @@ if(test_result)
 		test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
 		cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
 
-
+		moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
 
 
 	}
@@ -435,6 +454,7 @@ if(test_result)
 }
 else cout << "cannot write on test_result" << endl;
 
+	cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;
 
 
 
