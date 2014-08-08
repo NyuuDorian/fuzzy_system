@@ -30,7 +30,7 @@ using namespace std;
 
 //#define NBRE_POINTS 2000
 //#define NBRE_COORD 8
-#define NBRE_ITERATION 4
+#define NBRE_ITERATION 10
 
 
 
@@ -241,6 +241,7 @@ else
 	int* matrice_of_all_value= new int[NBRE_POINTS];//value -1 or +1
 	int* matrice_of_all_prediction_value= new int[NBRE_POINTS];//value -1 or +1
 	bool can_read_next(true);
+	vector<int> mat_of_all_points_rank;
 
 	for(int i=0; i<NBRE_POINTS; i++) matrice_of_all_coord[i]=new double[NBRE_COORD]; 
 
@@ -311,7 +312,19 @@ else
 
 //mix randomly the datas
 	srand(time(0));
-	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+	//randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+
+	int data_fold_beginning[NBRE_ITERATION]={0}, data_fold_ending[NBRE_ITERATION]={0};
+	for(int i=0; i<NBRE_ITERATION; i++)
+	{
+		data_fold_beginning[i]=i*NBRE_POINTS/NBRE_ITERATION;
+		if(i!=NBRE_ITERATION-1) data_fold_ending[i]=i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
+		else data_fold_ending[i]=NBRE_POINTS-1;
+	}
+
+	
+ 
+
 
 //check the matrix outputed after applying randomly_mixed function
 	/*for(int i=0; i<NBRE_POINTS; i++)
@@ -340,7 +353,6 @@ if(test_result)
 		double* SIGMA=new double[(int)pow(K,NBRE_COORD)];		
 		double* inverse_SIGMA=new double[(int)pow(K,NBRE_COORD)];
 
-		for(int i=0; i<(int)pow(K,NBRE_COORD); i++) MU[i]=0;
 		//cout << (int)pow(K,NBRE_COORD) << endl;
 
 
@@ -372,14 +384,22 @@ if(test_result)
 
 		for(int i=0; i<NBRE_ITERATION; i++)		
 		{
+
+
+			
+			for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
+			for(int i=0; i<(int)pow(K,NBRE_COORD); i++) MU[i]=0;//initiliasition everything at 0
+			for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
+
+			for(int n=0; n<(int)mat_of_all_points_rank.size(); n++)
 			//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
-			for(int j=i*100; j<i*100+100; j++)
+			//for(int j=i*100; j<i*100+100; j++)
 			{
 
-//calc of vector membership value of vector x
-				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
-			
+				int nb_rand = rand() % mat_of_all_points_rank.size();				
 
+//calc of vector membership value of vector x				
+				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];			
 
 				//initialisation a 1
 				for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
@@ -389,34 +409,42 @@ if(test_result)
 					{
 						//get_value_membership_function(double x, double k, double L)
 						//membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)(matrix_for_calc_of_membership_func[k][l]+1)/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
-						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
+						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[mat_of_all_points_rank[nb_rand]][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
 					}
 					//if(membership_value_of_x[k]!=0 && K==2) cout << k << " " << membership_value_of_x[k] << endl;				
 				}
 
 //now improve mean and variance using membership_value_of_x
 //TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
-				ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
+				ALPHA=calculate_ALPHA_i(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
 				SIGMA=calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD));//inverse of inverse gives natural
-				MU=calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[j], (int)pow(K,NBRE_COORD));
+				MU=calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], (int)pow(K,NBRE_COORD));
 				inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD)), ALPHA, phi, (int)pow(K,NBRE_COORD));
 
+
+				mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
+
+
 				delete membership_value_of_x;
-			}
+			}//previous end of each point getting through
 
 //TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
 //here we calculate the inference of the test datas to know if the classifier is effective
 			int counter_correct_classification(0);
 			double classifier(0);			
 
+
+
+			for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
 			//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
-			for( int j=i*100+100; j<i*100+2*100; j++ )
+			//for( int j=i*100+100; j<i*100+2*100; j++ )
 	    {
 
 //have to change every j with tmp_bis
-				int tmp_bis(0);
-				if(j<NBRE_POINTS) tmp_bis=j;
-				else tmp_bis=j-NBRE_POINTS;
+				int tmp_bis(m);
+				//int tmp_bis(0);
+				//if(j<NBRE_POINTS) tmp_bis=j;
+				//else tmp_bis=j-NBRE_POINTS;
 
 
 //calc of vector membership value of vector x
@@ -449,14 +477,14 @@ if(test_result)
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
 		
-			//test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
-			test_result << (double)counter_correct_classification*100/100 << " %" << endl;
-			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
+			test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
+			//test_result << (double)counter_correct_classification*100/100 << " %" << endl;
+			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
 
 
-			//moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
-			moyenne_pourcentage+=(double)counter_correct_classification*100/100
+			moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
+			//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 
 
 		}
