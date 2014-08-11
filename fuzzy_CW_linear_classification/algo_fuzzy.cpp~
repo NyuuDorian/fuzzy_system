@@ -43,7 +43,7 @@ using namespace std;
 
 
 //calculate the value of the membership value
-double get_value_membership_function(double x, double k, double L)
+inline double get_value_membership_function(double x, double k, double L)
 {
 	double value_membership(0), a(0), b(0);
 	//cout << "k " << k << endl;
@@ -54,24 +54,28 @@ double get_value_membership_function(double x, double k, double L)
 }
 
 
-double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double alpha_i, int y_i, int dim)
+inline double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double alpha_i, int y_i, int dim)
 {
-	double* new_MU=new double[dim];
+	//double* new_MU=new double[dim];
+	//double new_MU[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//if(X_i[j]!=0) cout << j << "\tinit_new_MU " << new_MU[j] << "\tnew_MU_calc ";
-		new_MU[j]=MU_i[j]+alpha_i*y_i*SIGMA_i[j]*X_i[j];
+		//new_MU[j]=MU_i[j]+alpha_i*y_i*SIGMA_i[j]*X_i[j];
+		MU_i[j]+=alpha_i*y_i*SIGMA_i[j]*X_i[j];
 		/*if(X_i[j]!=0)
 		{
 			//cout << new_MU[j] << "\tMU " << MU_i[j] << "\tSIGMA " << SIGMA_i[j] << "\tX_i " << X_i[j] << "\talpha_i " << alpha_i << "\ty_i " << y_i << endl; //HELP to detect the error
 		}*/
 	}
-	return new_MU;
+	//return new_MU;
+	return MU_i;
 }
 
-double* calculate_inverse_SIGMA_i(double* SIGMA, int dim)
+inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse_SIGMA)
 {
-	double* inverse_SIGMA=new double[dim];
+	//double* inverse_SIGMA=new double[dim];
+	//double inverse_SIGMA[dim];	
 	for(int i=0; i<dim; i++)
 	{
 		if(SIGMA[i]==0) inverse_SIGMA[i]=0;
@@ -80,19 +84,23 @@ double* calculate_inverse_SIGMA_i(double* SIGMA, int dim)
 	return inverse_SIGMA;
 }
 
-double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
-	double* new_inverse_SIGMA=new double[dim];
+	//double* new_inverse_SIGMA=new double[dim];
+	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
-		new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
+		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
 	}	
-	return new_inverse_SIGMA;
+	//return new_inverse_SIGMA;
+	return inverse_SIGMA_i;
 }
 
-double* diag_X_i( double* X, int dim)
+inline double* diag_X_i( double* X, int dim, double* diag_X)
 {
-	double* diag_X = new double[dim];
+	//double* diag_X = new double[dim];
+	//double diag_X[dim];
 	for(int i=0; i<dim; i++)
 	{
 		diag_X[i]=pow(X[i],2);
@@ -101,7 +109,7 @@ double* diag_X_i( double* X, int dim)
 }
 
 
-double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
+inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
 {
 	double GAMMA(0), M_i(0), V_i(0);
 	
@@ -135,7 +143,7 @@ double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 
 
 //ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
-double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
+inline double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
 {
 	double ALPHA(0), GAMMA=calculate_GAMMA_i(y_i, x_i, MU_i, SIGMA_i, dim, PHI);
 	ALPHA=max(GAMMA, (double)0);
@@ -312,14 +320,14 @@ else
 
 //mix randomly the datas
 	srand(time(0));
-	//randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
+	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
 
 	int data_fold_beginning[NBRE_ITERATION]={0}, data_fold_ending[NBRE_ITERATION]={0};
 	for(int i=0; i<NBRE_ITERATION; i++)
 	{
 		data_fold_beginning[i]=i*NBRE_POINTS/NBRE_ITERATION;
 		if(i!=NBRE_ITERATION-1) data_fold_ending[i]=i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
-		else data_fold_ending[i]=NBRE_POINTS-1;
+		else data_fold_ending[i]=NBRE_POINTS;
 	}
 
 	
@@ -343,8 +351,8 @@ ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
 
-	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7
-	for(int K=2; K<4; K++)
+	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~4 for the moment
+	for(int K=2; K<5; K++)
 	{
 		double moyenne_pourcentage(0);
 
@@ -352,18 +360,10 @@ if(test_result)
 		double* MU=new double[(int)pow(K,NBRE_COORD)]; //consequent_real_value
 		double* SIGMA=new double[(int)pow(K,NBRE_COORD)];		
 		double* inverse_SIGMA=new double[(int)pow(K,NBRE_COORD)];
+		double* diag_X=new double[(int)pow(K,NBRE_COORD)];
 
 		//cout << (int)pow(K,NBRE_COORD) << endl;
 
-
-//initiliser MU et SIGMA avec des valeurs aleatoires entre -1 et 1, (eventuellement eviter le 0 ? pour la diagonale de SIGMA)
-//SIGMA etant une matrice diagonale, nous utilisont un vecteur (moins lourd et facilite les calculs)
-		for(int i=0; i<(int)pow(K,NBRE_COORD); i++) 
-		{
-			//MU[i]=0;
-			SIGMA[i]=a;
-			inverse_SIGMA[i]=1/a;
-		}
 
 //TODO LIST initiliser une liste de longueur (int)pow(K,NBRE_COORD) qui contiendra toutes les valeurs possibles ==> DONE
 		int** matrix_for_calc_of_membership_func =	new int*[(int)pow(K,NBRE_COORD)];
@@ -388,8 +388,18 @@ if(test_result)
 
 			
 			for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
-			for(int i=0; i<(int)pow(K,NBRE_COORD); i++) MU[i]=0;//initiliasition everything at 0
+			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) MU[z]=0;//initiliasition everything at 0
 			for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
+//initiliser MU et SIGMA avec des valeurs aleatoires entre -1 et 1, (eventuellement eviter le 0 ? pour la diagonale de SIGMA)
+//SIGMA etant une matrice diagonale, nous utilisont un vecteur (moins lourd et facilite les calculs)
+			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) 
+			{
+				//MU[i]=0;
+				SIGMA[z]=a;
+				inverse_SIGMA[z]=1/a;
+			}
+
+
 
 			for(int n=0; n<(int)mat_of_all_points_rank.size(); n++)
 			//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
@@ -417,9 +427,10 @@ if(test_result)
 //now improve mean and variance using membership_value_of_x
 //TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
 				ALPHA=calculate_ALPHA_i(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
-				SIGMA=calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD));//inverse of inverse gives natural
-				MU=calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], (int)pow(K,NBRE_COORD));
-				inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD)), ALPHA, phi, (int)pow(K,NBRE_COORD));
+				/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD), SIGMA);//inverse of inverse gives natural
+				/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], (int)pow(K,NBRE_COORD));
+				diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X);
+				/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
 
 
 				mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
@@ -442,6 +453,7 @@ if(test_result)
 
 //have to change every j with tmp_bis
 				int tmp_bis(m);
+				
 				//int tmp_bis(0);
 				//if(j<NBRE_POINTS) tmp_bis=j;
 				//else tmp_bis=j-NBRE_POINTS;
@@ -476,14 +488,17 @@ if(test_result)
 	    }
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
+
+
+			int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
 		
-			test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
+			test_result << "K=" << K << "\t" << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
 			//test_result << (double)counter_correct_classification*100/100 << " %" << endl;
 			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
 
 
-			moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
+			moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
 			//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 
 
@@ -494,6 +509,7 @@ if(test_result)
 		delete MU;
 		delete SIGMA;
 		delete inverse_SIGMA;
+		delete diag_X;
 
 
 		cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;

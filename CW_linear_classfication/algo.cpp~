@@ -35,31 +35,28 @@ double** produit_matriciel()
 
 //MU=calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
 
-double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double alpha_i, int y_i, int dim)
+inline double* calculate_MU_i_plus_1(double* MU_i, double* SIGMA_i, double* X_i, double alpha_i, int y_i, int dim)
 {
-	double* new_MU=new double[dim];
+	//double* new_MU=new double[dim];
+	//double new_MU[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//if(X_i[j]!=0) cout << j << "\tinit_new_MU " << new_MU[j] << "\tnew_MU_calc ";
-		new_MU[j]=MU_i[j]+alpha_i*y_i*SIGMA_i[j]*X_i[j];
-		
-		//cerr << "coord " << j << "\t" << "MU_i " << MU_i[j] << "\t" << "alpha " << alpha_i << "\t" << "sign " << y_i << "\t" << "SIGMA_i " << SIGMA_i[j] << "\t" << "X_i" << X_i[j] << "\t" ;
-
-
+		//new_MU[j]=MU_i[j]+alpha_i*y_i*SIGMA_i[j]*X_i[j];
+		MU_i[j]+=alpha_i*y_i*SIGMA_i[j]*X_i[j];
 		/*if(X_i[j]!=0)
 		{
 			//cout << new_MU[j] << "\tMU " << MU_i[j] << "\tSIGMA " << SIGMA_i[j] << "\tX_i " << X_i[j] << "\talpha_i " << alpha_i << "\ty_i " << y_i << endl; //HELP to detect the error
 		}*/
 	}
-
-	//cerr << "\n";
-
-	return new_MU;
+	//return new_MU;
+	return MU_i;
 }
 
-double* calculate_inverse_SIGMA_i(double* SIGMA, int dim)
+inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse_SIGMA)
 {
-	double* inverse_SIGMA=new double[dim];
+	//double* inverse_SIGMA=new double[dim];
+	//double inverse_SIGMA[dim];	
 	for(int i=0; i<dim; i++)
 	{
 		if(SIGMA[i]==0) inverse_SIGMA[i]=0;
@@ -68,19 +65,23 @@ double* calculate_inverse_SIGMA_i(double* SIGMA, int dim)
 	return inverse_SIGMA;
 }
 
-double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
-	double* new_inverse_SIGMA=new double[dim];
+	//double* new_inverse_SIGMA=new double[dim];
+	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
-		new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
+		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
 	}	
-	return new_inverse_SIGMA;
+	//return new_inverse_SIGMA;
+	return inverse_SIGMA_i;
 }
 
-double* diag_X_i( double* X, int dim)
+inline double* diag_X_i( double* X, int dim, double* diag_X)
 {
-	double* diag_X = new double[dim];
+	//double* diag_X = new double[dim];
+	//double diag_X[dim];
 	for(int i=0; i<dim; i++)
 	{
 		diag_X[i]=pow(X[i],2);
@@ -89,7 +90,7 @@ double* diag_X_i( double* X, int dim)
 }
 
 
-double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
+inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
 {
 	double GAMMA(0), M_i(0), V_i(0);
 	
@@ -97,12 +98,9 @@ double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 	for(int j=0; j<dim; j++)
 	{
 		M_i+=x_i[j]*MU_i[j];
-//BEWARE this cerr helps for debugging abalone ONLY
-		//cerr << "x_i " << x_i[j] << "\t" << "MU_i " << MU_i[j] << "\t";
 	}
 	M_i*=y_i;
-	//cerr << "\n";
-	//cerr << "M_i " << M_i << "\t";
+//	cerr << "M_i " << M_i << "\t";
 
 //V_i=tranposee_x_i*SIGMA_i*x_i;
 	for(int j=0; j<dim; j++)
@@ -111,28 +109,29 @@ double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, in
 	}
 	if(V_i==0) V_i=0.00000001;
 
-	//cerr << "V_i " << V_i << "\t";
+//	cerr << "V_i " << V_i << "\t";
 
-	//double tmp((1+2*PHI*M_i ) - (8 * PHI * (M_i -PHI*V_i )));
+//	double tmp((1+2*PHI*M_i ) - (8 * PHI * (M_i -PHI*V_i )));
 
 	GAMMA=( -(1+2*PHI*M_i) + sqrt( pow(1+2*PHI*M_i, 2 ) - (8 * PHI * (M_i -PHI*V_i )) ))/(4*PHI*V_i);
 	
 
-	//cerr << "tmp " << tmp << "\t";
-	//cerr << "GAMMA " << GAMMA << endl;
+//	cerr << "tmp " << tmp << "\t";
+//	cerr << "GAMMA " << GAMMA << endl;
 
 	return GAMMA;
 }
 
 
 //ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
-double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
+inline double calculate_ALPHA_i(int y_i, double* x_i, double* MU_i, double* SIGMA_i, int dim, double PHI)
 {
 	double ALPHA(0), GAMMA=calculate_GAMMA_i(y_i, x_i, MU_i, SIGMA_i, dim, PHI);
 	ALPHA=max(GAMMA, (double)0);
 //	cout << ALPHA << endl;
 	return ALPHA;
 }
+
 
 //permet de melanger de maniere aleatoire les donnees recue creant ainsi des donnees totalement random
 void randomly_mix(double** matrice_of_all_coord, int* matrice_of_all_value, int NBRE_POINTS, int NBRE_COORD)
@@ -224,12 +223,14 @@ else
 
 	double* MU=new double[NBRE_COORD]; // all points initialized to 0
 	double* SIGMA=new double[NBRE_COORD]; //TODO LIST : SIGMA[0] = a * I avec I matrice unite ds d_x_d
-	double* inverse_SIGMA=new double[NBRE_COORD]; 
+	double* inverse_SIGMA=new double[NBRE_COORD];
+	double* diag_X=new double[NBRE_COORD];
 	double ALPHA(0);
 	double** matrice_of_all_coord= new double*[NBRE_POINTS];
 	int* matrice_of_all_value= new int[NBRE_POINTS];//value -1 or +1
 	int* matrice_of_all_prediction_value= new int[NBRE_POINTS];//value -1 or +1
 	bool can_read_next(true);
+	vector<int> mat_of_all_points_rank;
 
 	for(int i=0; i<NBRE_POINTS; i++) matrice_of_all_coord[i]=new double[NBRE_COORD];
 	for(int i=0; i<NBRE_COORD; i++) MU[i]=0; 
@@ -345,6 +346,16 @@ else
 	srand(time(0));
 	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
 
+
+	int data_fold_beginning[NBRE_ITERATION]={0}, data_fold_ending[NBRE_ITERATION]={0};
+	for(int i=0; i<NBRE_ITERATION; i++)
+	{
+		data_fold_beginning[i]=i*NBRE_POINTS/NBRE_ITERATION;
+		if(i!=NBRE_ITERATION-1) data_fold_ending[i]=i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
+		else data_fold_ending[i]=NBRE_POINTS;
+	}
+
+
 	double moyenne_pourcentage(0);
 
 
@@ -354,14 +365,32 @@ if(test_result)
 
 	for(int i=0; i<NBRE_ITERATION; i++)
 	{
-		for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
+
+		for(int z=0; z<NBRE_COORD; z++) MU[z]=0;//initiliasition everything at 0			
+//initiliser MU et SIGMA avec des valeurs aleatoires entre -1 et 1, (eventuellement eviter le 0 ? pour la diagonale de SIGMA)
+//SIGMA etant une matrice diagonale, nous utilisont un vecteur (moins lourd et facilite les calculs)
+		for(int z=0; z<NBRE_COORD; z++) 
+		{
+			//MU[i]=0;
+			SIGMA[z]=a;
+			inverse_SIGMA[z]=1/a;
+		}
+		for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
+		for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
+
+
+		for(int n=0; n<(int)mat_of_all_points_rank.size(); n++)
+		//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 		{
 //			cout << j << endl;
 			
-			//TODO LIST update alpha ==> DONE
-			cerr << j << "\t";
+			int nb_rand = rand() % mat_of_all_points_rank.size();
 
-			ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
+			//TODO LIST update alpha ==> DONE
+			//cerr << j << "\t";
+
+			ALPHA=calculate_ALPHA_i(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], matrice_of_all_coord[mat_of_all_points_rank[nb_rand]], MU, SIGMA, NBRE_COORD, phi);
+			//ALPHA=calculate_ALPHA_i(matrice_of_all_value[j], matrice_of_all_coord[j], MU, SIGMA, NBRE_COORD, phi);
 			//if(j<10) cout << ALPHA << endl;
 			//cout << j << "\t" << ALPHA << endl;
 			//inverse_SIGMA=calculate_inverse_SIGMA_i(SIGMA, NBRE_COORD);
@@ -373,7 +402,7 @@ if(test_result)
 			}*/
 
 
-			SIGMA=calculate_inverse_SIGMA_i(inverse_SIGMA, NBRE_COORD);//inverse of inverse gives natural
+			/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA, NBRE_COORD, SIGMA);//inverse of inverse gives natural
 			
 //test de la fonction inverse sigma
 			/*if(j<50) cout << endl;
@@ -384,8 +413,8 @@ if(test_result)
 			if(j<50) cout << endl << endl;*/
 
 
-			
-			MU=calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
+			calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[mat_of_all_points_rank[nb_rand]], ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], NBRE_COORD);
+//			/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, matrice_of_all_coord[j], ALPHA, matrice_of_all_value[j], NBRE_COORD);
 
 //TEST OF MU CALC ==> NOT OK
 			/*for(int k=0; k<NBRE_COORD; k++)
@@ -394,8 +423,12 @@ if(test_result)
 			}
 			if(j<2) cout << endl;*/
 
+			diag_X_i(matrice_of_all_coord[mat_of_all_points_rank[nb_rand]], NBRE_COORD, diag_X);
+//			diag_X_i(matrice_of_all_coord[j], NBRE_COORD, diag_X);
 
-			inverse_SIGMA=calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X_i(matrice_of_all_coord[i], NBRE_COORD), ALPHA, phi, NBRE_COORD);
+
+
+			/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X, ALPHA, phi, NBRE_COORD);
 //TEST OF INVERSE SIGMA
 			/*for(int k=0; k<NBRE_COORD; k++)
 			{
@@ -410,11 +443,12 @@ if(test_result)
 			double classifier(0);
 			//int minus_pos(0), maxi_pos(0), null_pos(0);			
 
-			for( int k=i*NBRE_POINTS/10+NBRE_POINTS/10; k<i*NBRE_POINTS/10+2*NBRE_POINTS/10; k++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+			for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
+			//for( int k=i*NBRE_POINTS/10+NBRE_POINTS/10; k<i*NBRE_POINTS/10+2*NBRE_POINTS/10; k++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
 	    {
-				int tmp(0);
-				if(k<NBRE_POINTS) tmp=k;
-				else tmp=k-NBRE_POINTS;
+				int tmp(m);
+				//if(k<NBRE_POINTS) tmp=k;
+				//else tmp=k-NBRE_POINTS;
 
 				classifier = 0;
 	      for( int l=0; l<NBRE_COORD; l++ ){
@@ -442,20 +476,32 @@ if(test_result)
     	}
 	
 			//if(j<50) cout << counter_correct_classification << endl ;
-		
-		test_result << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-		cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/(NBRE_POINTS/10) << " %" << endl;
 
-		moyenne_pourcentage+=(double)counter_correct_classification*100/(NBRE_POINTS/10);
+			int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
+		
+		test_result << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+		cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
+
+		moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
 
 
 	}
+
 
 }
 else cout << "cannot write on test_result" << endl;
 
 	cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;
 
+		//delete matrix_for_calc_of_membership_func;
+		delete MU;
+		delete SIGMA;
+		delete inverse_SIGMA;
+		delete diag_X;
+
+		delete matrice_of_all_coord;
+		delete matrice_of_all_value;//value -1 or +1
+		delete matrice_of_all_prediction_value;//value -1 or +1
 
 
 	return EXIT_SUCCESS;

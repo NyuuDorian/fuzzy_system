@@ -1,20 +1,30 @@
-52.0384 %
-65.7074 %
-70.2638 %
-77.458 %
-45.0839 %
-59.4724 %
-72.6619 %
-62.3501 %
-62.8297 %
-44.8441 %
-63.0695 %
-55.8753 %
-64.988 %
-57.7938 %
-49.1607 %
-63.0695 %
-70.7434 %
-58.9928 %
-71.223 %
-53.2374 %
+K=2	iteration 0	70.024 %
+K=2	iteration 1	57.7938 %
+K=2	iteration 2	65.4676 %
+K=2	iteration 3	70.024 %
+K=2	iteration 4	55.8753 %
+K=2	iteration 5	65.9472 %
+K=2	iteration 6	65.7074 %
+K=2	iteration 7	63.5492 %
+K=2	iteration 8	68.3453 %
+K=2	iteration 9	68.6603 %
+K=3	iteration 0	56.1151 %
+K=3	iteration 1	70.9832 %
+K=3	iteration 2	68.5851 %
+K=3	iteration 3	70.7434 %
+K=3	iteration 4	46.7626 %
+K=3	iteration 5	67.1463 %
+K=3	iteration 6	41.7266 %
+K=3	iteration 7	68.3453 %
+K=3	iteration 8	64.988 %
+K=3	iteration 9	68.8995 %
+K=4	iteration 0	60.4317 %
+K=4	iteration 1	68.8249 %
+K=4	iteration 2	58.0336 %
+K=4	iteration 3	66.6667 %
+K=4	iteration 4	65.7074 %
+K=4	iteration 5	63.0695 %
+K=4	iteration 6	57.3141 %
+K=4	iteration 7	66.6667 %
+K=4	iteration 8	59.2326 %
+K=4	iteration 9	67.7033 %

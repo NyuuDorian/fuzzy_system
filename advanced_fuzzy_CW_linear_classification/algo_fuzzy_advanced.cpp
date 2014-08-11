@@ -31,7 +31,7 @@ using namespace std;
 //#define NBRE_POINTS 2000
 //#define NBRE_COORD 8
 #define NBRE_ITERATION 10
-
+#define NBRE_POINTS_TO_USE 5
 
 
 
@@ -351,8 +351,8 @@ ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
 
-	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~4 for the moment
-	for(int K=2; K<5; K++)
+	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7
+	for(int K=2; K<4; K++)
 	{
 		double moyenne_pourcentage(0);
 
@@ -437,22 +437,25 @@ if(test_result)
 
 
 				delete membership_value_of_x;
-			}//previous end of each point getting through
 
-//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
+
+				if(n%NBRE_POINTS_TO_USE==4 || n==(int)mat_of_all_points_rank.size()-1)
+				{
+
+				//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
 //here we calculate the inference of the test datas to know if the classifier is effective
-			int counter_correct_classification(0);
-			double classifier(0);			
+				int counter_correct_classification(0);
+				double classifier(0);			
 
 
 
-			for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
+				for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
 			//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
 			//for( int j=i*100+100; j<i*100+2*100; j++ )
-	    {
+	  	  {
 
 //have to change every j with tmp_bis
-				int tmp_bis(m);
+					int tmp_bis(m);
 				
 				//int tmp_bis(0);
 				//if(j<NBRE_POINTS) tmp_bis=j;
@@ -460,31 +463,31 @@ if(test_result)
 
 
 //calc of vector membership value of vector x
-				double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
+					double* membership_value_of_x_bis = new double[(int)pow(K,NBRE_COORD)];
 
 				//initialisation a 1
-				for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
-				{
-					membership_value_of_x[k]=1;
-					for(int l=0; l<NBRE_COORD; l++)
+					for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
 					{
+						membership_value_of_x_bis[k]=1;
+						for(int l=0; l<NBRE_COORD; l++)
+						{
 						//get_value_membership_function(double x, double k, double L)
-						membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
-					}				
-				}
+							membership_value_of_x_bis[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
+						}				
+					}
 
-				classifier = 0;
-	      for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
-	        classifier += membership_value_of_x[l] * MU[l];
-	      }
+					classifier = 0;
+	     	 for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
+	     	   classifier += membership_value_of_x[l] * MU[l];
+	     	 }
 				//cout << k << " " << classifier << endl;
-      	if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
-      	else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
-   			else {matrice_of_all_prediction_value[tmp_bis]=0; }
-      	if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
+      		if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
+      		else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
+   				else {matrice_of_all_prediction_value[tmp_bis]=0; }
+      		if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
 
 
-				delete membership_value_of_x;
+					delete membership_value_of_x_bis;
 	    }
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
@@ -498,9 +501,15 @@ if(test_result)
 			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
 
 
-			moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
+			if(n==(int)mat_of_all_points_rank.size()-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
 			//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 
+
+			}
+
+
+
+			}//previous end of each point getting through
 
 		}
 

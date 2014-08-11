@@ -1,10 +1,11 @@
-47.2422 %
-55.6355 %
-54.9161 %
-67.6259 %
-65.7074 %
-69.7842 %
-64.5084 %
-47.9616 %
-69.7842 %
-72.9017 %
+iteration 0	29.0168 %
+iteration 1	67.1463 %
+iteration 2	69.3046 %
+iteration 3	68.1055 %
+iteration 4	68.5851 %
+iteration 5	48.4412 %
+iteration 6	69.0647 %
+iteration 7	57.554 %
+iteration 8	67.6259 %
+iteration 9	31.5789 %
+mean_% 57.6423 %
