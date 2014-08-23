@@ -65,14 +65,14 @@ inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse
 	return inverse_SIGMA;
 }
 
-inline double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(int y_i, double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
 	//double* new_inverse_SIGMA=new double[dim];
 	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
-		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
 	}	
 	//return new_inverse_SIGMA;
 	return inverse_SIGMA_i;
@@ -375,11 +375,14 @@ if(test_result)
 			SIGMA[z]=a;
 			inverse_SIGMA[z]=1/a;
 		}
+
+		mat_of_all_points_rank.clear();
 		for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
 		for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
 
 
-		for(int n=0; n<(int)mat_of_all_points_rank.size(); n++)
+		int taille((int)mat_of_all_points_rank.size());
+		for(int n=0; n<taille; n++)
 		//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 		{
 //			cout << j << endl;
@@ -428,7 +431,7 @@ if(test_result)
 
 
 
-			/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X, ALPHA, phi, NBRE_COORD);
+			/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], inverse_SIGMA, diag_X, ALPHA, phi, NBRE_COORD);
 //TEST OF INVERSE SIGMA
 			/*for(int k=0; k<NBRE_COORD; k++)
 			{

@@ -84,7 +84,7 @@ inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse
 	return inverse_SIGMA;
 }
 
-inline double* calculate_inverse_SIGMA_i_plus_1(double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(int y_i, double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
 	//double* new_inverse_SIGMA=new double[dim];
 	//double new_inverse_SIGMA[dim];
@@ -386,7 +386,7 @@ if(test_result)
 		{
 
 
-			
+			mat_of_all_points_rank.clear();
 			for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
 			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) MU[z]=0;//initiliasition everything at 0
 			for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
@@ -401,7 +401,8 @@ if(test_result)
 
 
 
-			for(int n=0; n<(int)mat_of_all_points_rank.size(); n++)
+			int taille((int)mat_of_all_points_rank.size());
+			for(int n=0; n<taille; n++)
 			//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 			//for(int j=i*100; j<i*100+100; j++)
 			{
@@ -430,7 +431,7 @@ if(test_result)
 				/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD), SIGMA);//inverse of inverse gives natural
 				/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], (int)pow(K,NBRE_COORD));
 				diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X);
-				/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
+				/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
 
 
 				mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
@@ -518,7 +519,9 @@ if(test_result)
 }
 else cout << "cannot write on test_result" << endl;
 
-	
+	delete matrice_of_all_coord;
+	delete matrice_of_all_value;//value -1 or +1
+	delete matrice_of_all_prediction_value;//value -1 or +1
 
 
 	return EXIT_SUCCESS;

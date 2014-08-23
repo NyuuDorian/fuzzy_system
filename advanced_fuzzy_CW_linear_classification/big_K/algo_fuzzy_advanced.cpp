@@ -322,14 +322,42 @@ else
 	srand(time(0));
 	randomly_mix(matrice_of_all_coord, matrice_of_all_value, NBRE_POINTS, NBRE_COORD);
 
-	int data_fold_beginning[NBRE_ITERATION]={0}, data_fold_ending[NBRE_ITERATION]={0};
+
+	int data_fold_beginning[NBRE_ITERATION]={0}, data_fold_ending[NBRE_ITERATION]={0}, reste(NBRE_POINTS%(NBRE_POINTS/NBRE_ITERATION));
+
 	for(int i=0; i<NBRE_ITERATION; i++)
 	{
-		data_fold_beginning[i]=i*NBRE_POINTS/NBRE_ITERATION;
-		if(i!=NBRE_ITERATION-1) data_fold_ending[i]=i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
-		else data_fold_ending[i]=NBRE_POINTS;
+		if(i==0)
+		{
+			data_fold_beginning[i]=0;//i*NBRE_POINTS/NBRE_ITERATION;
+			if(reste!=0) 
+			{
+				data_fold_ending[i]=NBRE_POINTS/NBRE_ITERATION+1;
+				reste--;
+			}
+			else data_fold_ending[i]=NBRE_POINTS/NBRE_ITERATION;//i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
+		}
+		else 
+		{
+			data_fold_beginning[i]=data_fold_ending[i-1];
+			if(i!=NBRE_ITERATION-1) 
+			{
+				if(reste!=0) 
+				{
+					data_fold_ending[i]=data_fold_ending[i-1]+NBRE_POINTS/NBRE_ITERATION+1;//i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
+					reste--;
+				}
+				else data_fold_ending[i]=data_fold_ending[i-1]+NBRE_POINTS/NBRE_ITERATION;//i*NBRE_POINTS/NBRE_ITERATION+NBRE_POINTS/NBRE_ITERATION;
+			}
+			else data_fold_ending[i]=NBRE_POINTS;
+		}
 	}
 
+///test des def de debuts et fin de separation
+/*	for(int i=0; i<NBRE_ITERATION; i++)
+	{
+		cout << data_fold_beginning[i] << "\t" << data_fold_ending[i] << endl;
+	}*/
 	
  
 
@@ -351,7 +379,7 @@ ofstream test_result("test_result_"+ title_doc +".txt");
 if(test_result)
 {
 
-	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~4 for the moment
+	//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~5 for the moment
 	for(int K=2; K<5; K++)
 	{
 		double moyenne_pourcentage(0);
@@ -388,8 +416,15 @@ if(test_result)
 
 			mat_of_all_points_rank.clear();
 			for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
+
+			//cout << mat_of_all_points_rank.size() << endl;
+
 			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) MU[z]=0;//initiliasition everything at 0
 			for(int z=data_fold_beginning[i]; z<data_fold_ending[i]; z++) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+data_fold_beginning[i]);//removing all points belonging to the validation dataset
+
+			//cout << mat_of_all_points_rank.size() << endl;
+		
+
 //initiliser MU et SIGMA avec des valeurs aleatoires entre -1 et 1, (eventuellement eviter le 0 ? pour la diagonale de SIGMA)
 //SIGMA etant une matrice diagonale, nous utilisont un vecteur (moins lourd et facilite les calculs)
 			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) 
@@ -400,8 +435,8 @@ if(test_result)
 			}
 
 
-
 			int taille((int)mat_of_all_points_rank.size());
+
 			for(int n=0; n<taille; n++)
 			//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 			//for(int j=i*100; j<i*100+100; j++)
@@ -438,7 +473,7 @@ if(test_result)
 
 
 				delete membership_value_of_x;
-			}//previous end of each point getting through
+//			}//previous end of each point getting through
 
 //TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
 //here we calculate the inference of the test datas to know if the classifier is effective
@@ -491,17 +526,25 @@ if(test_result)
 				//if(j<50) cout << counter_correct_classification << endl ;
 
 
-			int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
+			/*int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
 		
 			test_result << "K=" << K << "\t" << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
 			cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
 			//test_result << (double)counter_correct_classification*100/100 << " %" << endl;
-			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;
+			//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;*/
+
+			int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
+
+			if(n==0) test_result << "K=" << K << "\t" << "iteration " << i << endl;		
+			test_result << (double)counter_correct_classification*100/nbre_elt << "\t";//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+			cout << "K=" << K << "\titeration " << i << "\tpts n. " << n << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
 
 
-			moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
+			if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
 			//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
+			}
 
+			test_result << endl;
 
 		}
 
