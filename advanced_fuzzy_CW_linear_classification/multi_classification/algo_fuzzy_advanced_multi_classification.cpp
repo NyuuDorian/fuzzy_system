@@ -295,7 +295,7 @@ int main(int argc, char** argv)
 				fichier >> mot;	//read CLASS
 				//cout << mot << endl;
 				/*if(stoi(mot)==0) matrice_of_all_value[i]=-1;			
-				else */matrice_of_all_value[i]=stoi(mot);//on garde la classe ORIGINALE
+				else */matrice_of_all_value[i]=stoi(mot);//on garde la classe ORIGINALE i.e. 0 || 1
 				//class_value.push_back(stoi(classe));
 
 				can_read_next=true;
@@ -473,95 +473,88 @@ int main(int argc, char** argv)
 						int nb_rand = rand() % mat_of_all_points_rank.size();				
 
 		//calc of vector membership value of vector x				
-						double** membership_value_of_x = new double*[NBRE_CLASSES];	
-						for(int z=0; z<NBRE_CLASSES; z++) membership_value_of_x[z]=new double[(int)pow(K,NBRE_COORD)];		
+						double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];			
 
+
+						//initialisation a 1
+						for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
+						{
+							membership_value_of_x[k]=1;
+							for(int l=0; l<NBRE_COORD; l++)
+							{
+								//get_value_membership_function(double x, double k, double L)
+								//membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)(matrix_for_calc_of_membership_func[k][l]+1)/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
+								membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[mat_of_all_points_rank[nb_rand]][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
+							}
+							//if(membership_value_of_x[k]!=0 && K==2) cout << k << " " << membership_value_of_x[k] << endl;				
+						}
+
+			//now improve mean and variance using membership_value_of_x
+			//TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
 
 						for(int t=0; t<NBRE_CLASSES; t++)
 						{
 
-							//initialisation a 1
-							for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
-							{
-								membership_value_of_x[t][k]=1;
-								for(int l=0; l<NBRE_COORD; l++)
-								{
-									//get_value_membership_function(double x, double k, double L)
-									//membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)(matrix_for_calc_of_membership_func[k][l]+1)/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
-									membership_value_of_x[t][k]*=get_value_membership_function(matrice_of_all_coord[mat_of_all_points_rank[nb_rand]][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
-								}
-								//if(membership_value_of_x[k]!=0 && K==2) cout << k << " " << membership_value_of_x[k] << endl;				
-							}
-
-			//now improve mean and variance using membership_value_of_x
-			//TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
 
 							int signe(0);
 							if(matrice_of_all_value[mat_of_all_points_rank[nb_rand]]==t) signe=1;
 							else signe=-1;					
 
-							ALPHA[t]=calculate_ALPHA_i(signe, membership_value_of_x[t], MU[t], SIGMA[t], (int)pow(K,NBRE_COORD), phi);
+							ALPHA[t]=calculate_ALPHA_i(signe, membership_value_of_x, MU[t], SIGMA[t], (int)pow(K,NBRE_COORD), phi);
 							/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA[t], (int)pow(K,NBRE_COORD), SIGMA[t]);//inverse of inverse gives natural
-							/*MU=*/calculate_MU_i_plus_1(MU[t], SIGMA[t], membership_value_of_x[t], ALPHA[t], signe, (int)pow(K,NBRE_COORD));
-							diag_X_i(membership_value_of_x[t], (int)pow(K,NBRE_COORD), diag_X[t]);
+							/*MU=*/calculate_MU_i_plus_1(MU[t], SIGMA[t], membership_value_of_x, ALPHA[t], signe, (int)pow(K,NBRE_COORD));
+							diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X[t]);
 							/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(signe, inverse_SIGMA[t], diag_X[t], ALPHA[t], phi, (int)pow(K,NBRE_COORD));
 						}
 
 						mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
 
 
-						for(int z=0; z<NBRE_CLASSES; z++) delete membership_value_of_x[z];
-						delete membership_value_of_x;
-			//			}//previous end of each point getting through
+				//			}//previous end of each point getting through
 
-		//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
-		//here we calculate the inference of the test datas to know if the classifier is effective
+			//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
+			//here we calculate the inference of the test datas to know if the classifier is effective
 
 
-					int counter_correct_classification(0);
-					double classifier[NBRE_CLASSES];
-					for(int z=0; z<NBRE_CLASSES; z++) classifier[z]=0;		
+						int counter_correct_classification(0);
+						double classifier[NBRE_CLASSES];
+						for(int z=0; z<NBRE_CLASSES; z++) classifier[z]=0;		
 			
 
 
 
-					for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
-					//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
-					//for( int j=i*100+100; j<i*100+2*100; j++ )
-					{
-
-		//have to change every j with tmp_bis
-						int tmp_bis(m);
-			
-						//int tmp_bis(0);
-						//if(j<NBRE_POINTS) tmp_bis=j;
-						//else tmp_bis=j-NBRE_POINTS;
-
-
-		//calc of vector membership value of vector x
-						double** membership_value_of_x = new double*[NBRE_CLASSES];	
-						for(int z=0; z<NBRE_CLASSES; z++) membership_value_of_x[z]=new double[(int)pow(K,NBRE_COORD)];
-
-
-						for(int t=0; t<NBRE_CLASSES; t++)
+						for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
+						//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+						//for( int j=i*100+100; j<i*100+2*100; j++ )
 						{
+
+			//have to change every j with tmp_bis
+							int tmp_bis(m);
+			
+							//int tmp_bis(0);
+							//if(j<NBRE_POINTS) tmp_bis=j;
+							//else tmp_bis=j-NBRE_POINTS;
+
+
 							//initialisation a 1
 							for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
 							{
-								membership_value_of_x[t][k]=1;
+								membership_value_of_x[k]=1;
 								for(int l=0; l<NBRE_COORD; l++)
 								{
 									//get_value_membership_function(double x, double k, double L)
-									membership_value_of_x[t][k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
+									membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
 								}				
 							}
 				
 
-							classifier[t] = 0;
-							for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
-								classifier[t] += membership_value_of_x[t][l] * MU[t][l];
+							for(int t=0; t<NBRE_CLASSES; t++)
+							{
+								classifier[t] = 0;
+								for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
+									classifier[t] += membership_value_of_x[l] * MU[t][l];
+								}
 							}
-						}
 
 
 			//TODO LIST a adapter pour la multiclassification pour le choix de la "classe"
@@ -577,7 +570,10 @@ int main(int argc, char** argv)
 							}
 
 							bool alone(true);
-							for(int z=0; z<NBRE_CLASSES; z++) if(classifier[z]==rank_of_classe[0] && z!=rank_of_classe[1]) alone=false;
+							for(int z=0; z<NBRE_CLASSES; z++) 
+							{	
+								if(classifier[z]==rank_of_classe[0] && z!=rank_of_classe[1]) alone=false;
+							}
 			
 							/*if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
 							else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
@@ -592,15 +588,15 @@ int main(int argc, char** argv)
 
 						int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
 
-						//if(n==0) test_result << "K=" << K << "\t" << "iteration " << i << endl;		
+						if(n==0) test_result << "K=" << K << "\t" << "iteration " << i << endl;		
 						test_result << (double)counter_correct_classification*100/nbre_elt << "\t";//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
 						cout << "K=" << K << "\titeration " << i << "\tpts n. " << n << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
+						if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
 
 
 
 
-						for(int z=0; z<NBRE_CLASSES; z++) delete membership_value_of_x[z];
-						delete membership_value_of_x;
+						delete[] membership_value_of_x;
 					}
 
 						//if(j<50) cout << counter_correct_classification << endl ;
@@ -615,7 +611,7 @@ int main(int argc, char** argv)
 
 
 
-				//if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
+				//
 				//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 		
 
@@ -623,17 +619,23 @@ int main(int argc, char** argv)
 
 				}
 		
-				for(int z=0; z<NBRE_CLASSES; z++) delete matrix_for_calc_of_membership_func[z];
-				delete matrix_for_calc_of_membership_func;
-				for(int z=0; z<NBRE_CLASSES; z++) delete MU[z];	
-				delete MU;
-				for(int z=0; z<NBRE_CLASSES; z++) delete SIGMA[z];
-				delete SIGMA;
-				for(int z=0; z<NBRE_CLASSES; z++) delete inverse_SIGMA[z];
-				delete inverse_SIGMA;
-				for(int z=0; z<NBRE_CLASSES; z++) delete diag_X[z];
-				delete diag_X;
+				for(int z=0; z<NBRE_CLASSES; z++) delete[] matrix_for_calc_of_membership_func[z];
+				delete[] matrix_for_calc_of_membership_func;
+				for(int z=0; z<NBRE_CLASSES; z++) delete[] MU[z];	
+				delete[] MU;
+				for(int z=0; z<NBRE_CLASSES; z++) delete[] SIGMA[z];
+				delete[] SIGMA;
+				for(int z=0; z<NBRE_CLASSES; z++) delete[] inverse_SIGMA[z];
+				delete[] inverse_SIGMA;
+				for(int z=0; z<NBRE_CLASSES; z++) delete[] diag_X[z];
+				delete[] diag_X;
 
+/*				delete matrix_for_calc_of_membership_func;
+				delete MU;
+				delete SIGMA;
+				delete inverse_SIGMA;
+				delete diag_X;
+*/
 
 				//cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;
 		
@@ -641,12 +643,15 @@ int main(int argc, char** argv)
 		}
 		else cout << "cannot write on test_result" << endl;
 
-		for(int z=0; z<NBRE_CLASSES; z++) delete matrice_of_all_coord[z];
-		delete matrice_of_all_coord;
+		for(int z=0; z<NBRE_CLASSES; z++) delete[] matrice_of_all_coord[z];
+		delete[] matrice_of_all_coord;
+		delete[] matrice_of_all_value;//value -1 or +1
+		delete[] matrice_of_all_prediction_value;//value -1 or +1
+
+/*		delete matrice_of_all_coord;
 		delete matrice_of_all_value;//value -1 or +1
 		delete matrice_of_all_prediction_value;//value -1 or +1
-
-
+*/
 		return EXIT_SUCCESS;
 	}
 }
