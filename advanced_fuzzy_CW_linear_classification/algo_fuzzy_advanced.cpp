@@ -472,7 +472,7 @@ if(test_result)
 				mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
 
 
-				delete membership_value_of_x;
+				delete[] membership_value_of_x;
 //			}//previous end of each point getting through
 
 //TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
@@ -520,7 +520,7 @@ if(test_result)
       	if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
 
 
-				delete membership_value_of_x;
+				delete[] membership_value_of_x;
 	    }
 	
 				//if(j<50) cout << counter_correct_classification << endl ;
@@ -548,12 +548,12 @@ if(test_result)
 
 		}
 
-
-		delete matrix_for_calc_of_membership_func;
-		delete MU;
-		delete SIGMA;
-		delete inverse_SIGMA;
-		delete diag_X;
+		for(int z=0; z<(int)pow(K,NBRE_COORD); z++) delete[] matrix_for_calc_of_membership_func[z];
+		delete[] matrix_for_calc_of_membership_func;
+		delete[] MU;
+		delete[] SIGMA;
+		delete[] inverse_SIGMA;
+		delete[] diag_X;
 
 
 		cout << "mean_% " << moyenne_pourcentage/NBRE_ITERATION << endl;
@@ -562,9 +562,10 @@ if(test_result)
 }
 else cout << "cannot write on test_result" << endl;
 
-	delete matrice_of_all_coord;
-	delete matrice_of_all_value;//value -1 or +1
-	delete matrice_of_all_prediction_value;//value -1 or +1
+	for(int z=0; z<NBRE_POINTS; z++) delete[] matrice_of_all_coord[z]; 
+	delete[] matrice_of_all_coord;
+	delete[] matrice_of_all_value;//value -1 or +1
+	delete[] matrice_of_all_prediction_value;//value -1 or +1
 
 
 	return EXIT_SUCCESS;

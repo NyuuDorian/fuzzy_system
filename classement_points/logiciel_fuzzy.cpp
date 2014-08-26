@@ -12,7 +12,7 @@ using namespace cimg_library;
 using namespace std;
 
 //#define taille_image 100
-#define TAILLE_IMAGE 200
+#define TAILLE_IMAGE 350
 
 class Point
 {

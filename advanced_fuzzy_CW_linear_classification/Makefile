@@ -14,6 +14,7 @@ make:algo_fuzzy_advanced.cpp
 launch:algo_fuzzy_advanced.exe
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug
+	./algo_fuzzy.exe breast_cancer_wisconsin_modified_normalized
 	./algo_fuzzy_advanced.exe breast_cancer_wisconsin_normalized
 	./algo_fuzzy_advanced.exe abalone_normalized
 	./algo_fuzzy_advanced.exe transfusion_normalized

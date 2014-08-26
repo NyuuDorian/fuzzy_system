@@ -14,10 +14,14 @@ make:algo_fuzzy_advanced_multi_classification.cpp
 launch:algo_fuzzy_advanced_multi_classification.exe
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug
-	./algo_fuzzy_advanced_multi_classification.exe breast_cancer_wisconsin_normalized
-	./algo_fuzzy_advanced_multi_classification.exe abalone_normalized
-	./algo_fuzzy_advanced_multi_classification.exe transfusion_normalized
-	./algo_fuzzy_advanced_multi_classification.exe pima-indians-diabetes_normalized
+	./algo_fuzzy_advanced_multi_classification.exe breast_cancer_wisconsin_normalized 2 4
+	./algo_fuzzy_advanced_multi_classification.exe breast_cancer_wisconsin_modified_normalized 2 4
+#	./algo_fuzzy_advanced_multi_classification.exe abalone_normalized
+	./algo_fuzzy_advanced_multi_classification.exe transfusion_normalized 2 4
+	./algo_fuzzy_advanced_multi_classification.exe pima-indians-diabetes_normalized 2 4
+	./algo_fuzzy_advanced_multi_classification.exe abalone_normalized_multiclass 2 3
+	./algo_fuzzy_advanced_multi_classification.exe iris_corrected_normalized 2 8
+	./algo_fuzzy_advanced_multi_classification.exe wines_normalized 2 5
 
 clean:
 	rm *.exe

@@ -11,8 +11,14 @@ CFLAGS=-Wall -std=c++11 -lm -lpthread -lX11 -o
 make:logiciel_fuzzy.cpp
 	$(CC) $(CFLAGS) logiciel_fuzzy.exe logiciel_fuzzy.cpp
 
-launch:algo.exe
+launch:logiciel_fuzzy.exe
 	./logiciel_fuzzy.exe
+
+make_bis:test.cpp
+	g++ -o aaa.exe test.cpp -lm -lpthread -lX11
+
+make_ter:logiciel_fuzzy.cpp
+	g++ -o logiciel_fuzzy.exe logiciel_fuzzy.cpp -lm -lpthread -lX11
 
 clean:
 	rm *.exe

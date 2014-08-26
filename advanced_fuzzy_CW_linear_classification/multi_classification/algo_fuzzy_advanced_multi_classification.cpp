@@ -214,11 +214,12 @@ int main(int argc, char** argv)
 {
 	
 
-	if(argc!=2) return -1;
+	if(argc!=4) return -1;
 	else
 	{
 		string title_doc(argv[1]);
-		
+		int taille_min_K(atoi(argv[2])), taille_max_K(atoi(argv[3]));		
+
 	
 		int NBRE_POINTS(0), NBRE_COORD(0), NBRE_CLASSES(0);
 
@@ -381,7 +382,7 @@ int main(int argc, char** argv)
 		{
 
 			//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~3 for the moment
-			for(int K=2; K<4; K++)
+			for(int K=taille_min_K; K<taille_max_K; K++)
 			{
 				double moyenne_pourcentage(0);
 
@@ -437,6 +438,21 @@ int main(int argc, char** argv)
 
 				for(int i=0; i<NBRE_ITERATION; i++)		
 				{
+
+
+//TODO LIST re-initialiser les valeurs de MU et SIGMA et inverse-SIGMA
+
+					for(int z=0; z<NBRE_CLASSES; z++)
+					{
+						for(int y=0; y<(int)pow(K,NBRE_COORD); y++)
+						{
+							MU[z][y]=0;
+							SIGMA[z][y]=a;
+							inverse_SIGMA[z][y]=1/a;
+							diag_X[z][y]=0;
+						}
+					}
+
 
 
 					mat_of_all_points_rank.clear();
