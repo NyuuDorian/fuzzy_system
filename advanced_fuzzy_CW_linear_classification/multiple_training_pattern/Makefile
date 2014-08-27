@@ -12,13 +12,14 @@ make:algo_fuzzy_advanced.cpp
 	$(CC) $(CFLAGS) algo_fuzzy_advanced.exe algo_fuzzy_advanced.cpp
 
 launch:algo_fuzzy_advanced.exe
-	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
-	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug
-	./algo_fuzzy.exe breast_cancer_wisconsin_modified_normalized 2 4
-	./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2 4
-#	./algo_fuzzy.exe abalone_normalized
-	./algo_fuzzy.exe transfusion_normalized 2 4
-	./algo_fuzzy.exe pima-indians-diabetes_normalized 2 4
+	#./algo_fuzzy_advanced.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
+	#./algo_fuzzy_advanced.exe breast_cancer_wisconsin_normalized_2_debug
+#	./algo_fuzzy_advanced.exe breast_cancer_wisconsin_modified_normalized 2 4
+#	./algo_fuzzy_advanced.exe breast_cancer_wisconsin_normalized 2 4
+#	./algo_fuzzy_advanced.exe abalone_normalized
+#	./algo_fuzzy_advanced.exe transfusion_normalized 2 4
+#	./algo_fuzzy_advanced.exe pima-indians-diabetes_normalized 2 4
+	./algo_fuzzy_advanced.exe breast_cancer_wisconsin_modified_normalized 2 3
 
 make_bis:algo_fuzzy.cpp
 	$(CC) $(CFLAGS) algo_fuzzy.exe algo_fuzzy.cpp

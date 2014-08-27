@@ -410,6 +410,9 @@ int main(int argc, char** argv)
 				//cout << endl;
 			}	
 
+for(int nb_pattern=2; nb_pattern<3; nb_pattern++)
+{
+	cout << "nb_pattern " << nb_pattern << endl;
 
 			for(int i=0; i<NBRE_ITERATION; i++)		
 			{
@@ -436,17 +439,51 @@ int main(int argc, char** argv)
 				}
 
 
-				int taille((int)mat_of_all_points_rank.size());
+				int taille(0), taille_mat_of_all_points_rank((int)mat_of_all_points_rank.size());
+				if((int)(mat_of_all_points_rank.size())%nb_pattern==0)
+					taille=taille_mat_of_all_points_rank/nb_pattern;
+				else
+					taille=taille_mat_of_all_points_rank/nb_pattern+1;			
+				cout << "taille " << taille << endl;
 
 				for(int n=0; n<taille; n++)
 				//for(int j=i*NBRE_POINTS/10; j<i*NBRE_POINTS/10+NBRE_POINTS/10; j++)
 				//for(int j=i*100; j<i*100+100; j++)
 				{
+					
+					int pattern_to_use[nb_pattern], nb_rand(0);
+					for(int z=0; z<nb_pattern; z++) pattern_to_use[z]=-1;
+					
+					for(int Np=0; Np<nb_pattern; Np++)
+					{
 
-					int nb_rand = rand() % mat_of_all_points_rank.size();				
+						//cout << Np << "\t";
+						if((int)mat_of_all_points_rank.size()>=nb_pattern || Np<(int)mat_of_all_points_rank.size())
+						{
+							bool isDifferent(false);
+							while(!isDifferent)
+							{
+								isDifferent=true;
+								nb_rand = rand() % (int)mat_of_all_points_rank.size();
+								for(int z=0; z<nb_pattern; z++) if(pattern_to_use[z]==nb_rand) isDifferent=false;
+
+							}				
+							pattern_to_use[Np]=nb_rand;
+						}
+					}						
 
 	//calc of vector membership value of vector x				
 					double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];			
+
+
+for(int Niteration=0; Niteration<10; Niteration++)
+{	
+	//cout << Niteration << "\t";
+	for(int Np=0; Np<nb_pattern; Np++)
+	{
+		if(pattern_to_use[Np]!=-1)
+		{
+	
 
 					//initialisation a 1
 					for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
@@ -456,21 +493,33 @@ int main(int argc, char** argv)
 						{
 							//get_value_membership_function(double x, double k, double L)
 							//membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[j][l], (double)(matrix_for_calc_of_membership_func[k][l]+1)/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
-							membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[mat_of_all_points_rank[nb_rand]][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
+							membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[mat_of_all_points_rank[pattern_to_use[Np]]][l], (double)matrix_for_calc_of_membership_func[k][l]+1/*BECAUSE VARIES BETWEEN 1..K*/, (double)K);//membership function of each coordinates
 						}
 						//if(membership_value_of_x[k]!=0 && K==2) cout << k << " " << membership_value_of_x[k] << endl;				
 					}
 
 	//now improve mean and variance using membership_value_of_x
 	//TODO LIST few modifications of the functions used below and defined a little in the upper part ==> DONE
-					ALPHA=calculate_ALPHA_i(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
+					ALPHA=calculate_ALPHA_i(matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], membership_value_of_x, MU, SIGMA, (int)pow(K,NBRE_COORD), phi);
 					/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD), SIGMA);//inverse of inverse gives natural
-					/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[nb_rand]], (int)pow(K,NBRE_COORD));
+					/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], (int)pow(K,NBRE_COORD));
 					diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X);
-					/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[nb_rand]], inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
+					/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
+			
+			//cout << Np << "\t";
+		}
+		//else cout << "not enough pattern to use left ?" << endl;
+	}
+}
 
 
-					mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
+					for(int z=0; z<nb_pattern; z++)
+					{
+						int nb_pts_avt_en_dessous(0);
+						if(z>0) for(int z_bis=0; z_bis<z; z_bis++) if(pattern_to_use[z]>pattern_to_use[z_bis] && pattern_to_use[z_bis]!=-1) nb_pts_avt_en_dessous++;
+						if(pattern_to_use[z]!=-1) mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+pattern_to_use[z]-nb_pts_avt_en_dessous); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D
+					//cout << (int)mat_of_all_points_rank.size() <<endl;
+					}
 
 
 					delete[] membership_value_of_x;
@@ -478,76 +527,78 @@ int main(int argc, char** argv)
 
 	//TODO LIST WRITE IN A FILE THE RESULTS ==> DONE
 	//here we calculate the inference of the test datas to know if the classifier is effective
-				int counter_correct_classification(0);
-				double classifier(0);			
+					int counter_correct_classification(0);
+					double classifier(0);			
 
 
 
-				for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
-				//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
-				//for( int j=i*100+100; j<i*100+2*100; j++ )
-			  {
-
-	//have to change every j with tmp_bis
-					int tmp_bis(m);
-				
-					//int tmp_bis(0);
-					//if(j<NBRE_POINTS) tmp_bis=j;
-					//else tmp_bis=j-NBRE_POINTS;
-
-
-	//calc of vector membership value of vector x
-					double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
-
-					//initialisation a 1
-					for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
+					for(int m=data_fold_beginning[i]; m<data_fold_ending[i]; m++)
+					//for( int j=i*NBRE_POINTS/10+NBRE_POINTS/10; j<i*NBRE_POINTS/10+2*NBRE_POINTS/10; j++ ) //on decale de +NBRE_POINTS/10 pour avoir les 200 points TESTS
+					//for( int j=i*100+100; j<i*100+2*100; j++ )
 					{
-						membership_value_of_x[k]=1;
-						for(int l=0; l<NBRE_COORD; l++)
+
+		//have to change every j with tmp_bis
+						int tmp_bis(m);
+				
+						//int tmp_bis(0);
+						//if(j<NBRE_POINTS) tmp_bis=j;
+						//else tmp_bis=j-NBRE_POINTS;
+
+
+		//calc of vector membership value of vector x
+						double* membership_value_of_x = new double[(int)pow(K,NBRE_COORD)];
+
+						//initialisation a 1
+						for(int k=0; k<(int)pow(K,NBRE_COORD); k++)
 						{
-							//get_value_membership_function(double x, double k, double L)
-							membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
-						}				
+							membership_value_of_x[k]=1;
+							for(int l=0; l<NBRE_COORD; l++)
+							{
+								//get_value_membership_function(double x, double k, double L)
+								membership_value_of_x[k]*=get_value_membership_function(matrice_of_all_coord[tmp_bis][l], (double)matrix_for_calc_of_membership_func[k][l]+1, (double)K);//membership function of each coordinates
+							}				
+						}
+
+						classifier = 0;
+					  for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
+					    classifier += membership_value_of_x[l] * MU[l];
+					  }
+						//cout << k << " " << classifier << endl;
+				  	if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
+				  	else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
+			 			else {matrice_of_all_prediction_value[tmp_bis]=0; }
+				  	if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
+
+
+						delete[] membership_value_of_x;
 					}
-
-					classifier = 0;
-			    for( int l=0; l<(int)pow(K,NBRE_COORD); l++ ){
-			      classifier += membership_value_of_x[l] * MU[l];
-			    }
-					//cout << k << " " << classifier << endl;
-		    	if( classifier > 0 ) matrice_of_all_prediction_value[tmp_bis] = 1;
-		    	else if (classifier < 0 ) matrice_of_all_prediction_value[tmp_bis] = -1;
-		 			else {matrice_of_all_prediction_value[tmp_bis]=0; }
-		    	if( matrice_of_all_prediction_value[tmp_bis]==matrice_of_all_value[tmp_bis] ) counter_correct_classification++;
-
-
-					delete[] membership_value_of_x;
-			  }
 	
-					//if(j<50) cout << counter_correct_classification << endl ;
+						//if(j<50) cout << counter_correct_classification << endl ;
 
 
-				/*int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
+					/*int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
 		
-				test_result << "K=" << K << "\t" << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-				cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
-				//test_result << (double)counter_correct_classification*100/100 << " %" << endl;
-				//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;*/
+					test_result << "K=" << K << "\t" << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+					cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
+					//test_result << (double)counter_correct_classification*100/100 << " %" << endl;
+					//cout << "iteration " << i << "\t" << (double)counter_correct_classification*100/100 << " %" << endl;*/
 
-				int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
+					int nbre_elt((data_fold_ending[i]-1)-data_fold_beginning[i]+1);
 
-				if(n==0) test_result << "K=" << K << "\t" << "iteration " << i << endl;		
-				test_result << (double)counter_correct_classification*100/nbre_elt << "\t";//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
-				cout << "K=" << K << "\titeration " << i << "\tpts n. " << n << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
+					if(n==0) test_result << "nb_pattern " << nb_pattern << "\tK=" << K << "\t" << "iteration " << i << endl;		
+					test_result << (double)counter_correct_classification*100/nbre_elt << "\t";//" " << minus_pos << " " << maxi_pos << " " << null_pos << endl;
+//TODO LIST REUSE LATER
+					cout << "nb_pattern " << nb_pattern << "\tK=" << K << "\titeration " << i << "\tpts n. " << n << "\t" << (double)counter_correct_classification*100/nbre_elt << " %" << endl;
 
 
-				if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
-				//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
+					if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
+					//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 				}
 
 				test_result << endl;
 
 			}
+}
 
 			for(int z=0; z<(int)pow(K,NBRE_COORD); z++) delete[] matrix_for_calc_of_membership_func[z];
 			delete[] matrix_for_calc_of_membership_func;
