@@ -126,7 +126,7 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 	{
 		V_i+=x_i[j]*SIGMA_i[j]*x_i[j];
 	}
-	if(V_i==0) V_i=0.00000001;
+	if(V_i==0) V_i=0.1;//either problem because it becomes singular (degenerated)
 
 //	cerr << "V_i " << V_i << "\t";
 

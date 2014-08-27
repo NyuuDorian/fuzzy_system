@@ -126,7 +126,7 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 	{
 		V_i+=x_i[j]*SIGMA_i[j]*x_i[j];
 	}
-	if(V_i==0) V_i=0.00000001;
+	if(V_i==0) V_i=0.1;
 
 //	cerr << "V_i " << V_i << "\t";
 
@@ -441,6 +441,18 @@ int main(int argc, char** argv)
 
 
 //TODO LIST re-initialiser les valeurs de MU et SIGMA et inverse-SIGMA
+
+					for(int z=0; z<NBRE_CLASSES; z++)
+					{
+						for(int y=0; y<(int)pow(K,NBRE_COORD); y++)
+						{
+							MU[z][y]=0;
+							SIGMA[z][y]=a;
+							inverse_SIGMA[z][y]=1/a;
+							diag_X[z][y]=0;
+						}
+					}
+
 
 
 					mat_of_all_points_rank.clear();
