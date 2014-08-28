@@ -84,14 +84,15 @@ inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse
 	return inverse_SIGMA;
 }
 
-inline double* calculate_inverse_SIGMA_i_plus_1(int y_i, double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(/*int y_i, */double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
 	//double* new_inverse_SIGMA=new double[dim];
 	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
-		inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		//inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
 	}	
 	//return new_inverse_SIGMA;
 	return inverse_SIGMA_i;
@@ -119,7 +120,7 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 		M_i+=x_i[j]*MU_i[j];
 	}
 	M_i*=y_i;
-//	cerr << "M_i " << M_i << "\t";
+	//cerr << "M_i " << M_i << "\t";
 
 //V_i=tranposee_x_i*SIGMA_i*x_i;
 	for(int j=0; j<dim; j++)
@@ -128,15 +129,15 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 	}
 	if(V_i==0) V_i=0.00000001;
 
-//	cerr << "V_i " << V_i << "\t";
+	//cerr << "V_i " << V_i << "\t";
 
-//	double tmp((1+2*PHI*M_i ) - (8 * PHI * (M_i -PHI*V_i )));
+//	double tmp(pow(1+2*PHI*M_i, 2 ) - (8 * PHI * (M_i -PHI*V_i )));
 
 	GAMMA=( -(1+2*PHI*M_i) + sqrt( pow(1+2*PHI*M_i, 2 ) - (8 * PHI * (M_i -PHI*V_i )) ))/(4*PHI*V_i);
 	
 
-//	cerr << "tmp " << tmp << "\t";
-//	cerr << "GAMMA " << GAMMA << endl;
+	//cerr << "tmp " << tmp << "\t";
+	//cerr << "GAMMA " << GAMMA << endl;
 
 	return GAMMA;
 }
@@ -383,6 +384,9 @@ int main(int argc, char** argv)
 		//define the number of divided areas for the fuzzy classification, here it varies between 2~3, maybe later will try 2~7 ==> 2~3 for the moment
 		for(int K=taille_min_K; K<taille_max_K; K++)
 		{
+
+			//cerr << "K= " << K;
+
 			double moyenne_pourcentage(0);
 
 			cout << "K="<< K << endl;
@@ -410,13 +414,17 @@ int main(int argc, char** argv)
 				//cout << endl;
 			}	
 
-for(int nb_pattern=2; nb_pattern<3; nb_pattern++)
+for(int nb_pattern=1; nb_pattern<6; nb_pattern++)
 {
 	cout << "nb_pattern " << nb_pattern << endl;
+
+	//cerr << " nb_pattern= " << nb_pattern;
+
 
 			for(int i=0; i<NBRE_ITERATION; i++)		
 			{
 
+				//cerr << " nb_iteration= " << i << " ";
 
 				mat_of_all_points_rank.clear();
 				for(int z=0; z<NBRE_POINTS; z++) mat_of_all_points_rank.push_back(z);//initialisation of vector<int> mat_of_all_points_rank;
@@ -504,7 +512,8 @@ for(int Niteration=0; Niteration<10; Niteration++)
 					/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA, (int)pow(K,NBRE_COORD), SIGMA);//inverse of inverse gives natural
 					/*MU=*/calculate_MU_i_plus_1(MU, SIGMA, membership_value_of_x, ALPHA, matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], (int)pow(K,NBRE_COORD));
 					diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X);
-					/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
+					/*inverse_SIGMA=*///calculate_inverse_SIGMA_i_plus_1(matrice_of_all_value[mat_of_all_points_rank[pattern_to_use[Np]]], inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
+					calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA, diag_X, ALPHA, phi, (int)pow(K,NBRE_COORD));
 			
 			//cout << Np << "\t";
 		}
@@ -592,6 +601,7 @@ for(int Niteration=0; Niteration<10; Niteration++)
 
 
 					if(n==taille-1) moyenne_pourcentage+=(double)counter_correct_classification*100/nbre_elt;
+					//if(counter_correct_classification==0) cerr << "ERROR" << endl;
 					//moyenne_pourcentage+=(double)counter_correct_classification*100/100;
 				}
 

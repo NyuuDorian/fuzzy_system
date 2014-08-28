@@ -11,6 +11,7 @@ CFLAGS=-Wall -std=c++11 -o
 make:algo_fuzzy_advanced.cpp
 	$(CC) $(CFLAGS) algo_fuzzy_advanced.exe algo_fuzzy_advanced.cpp
 
+
 launch:algo_fuzzy_advanced.exe
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized 2>breast_cancer_wisconsin_normalized.txt
 	#./algo_fuzzy.exe breast_cancer_wisconsin_normalized_2_debug

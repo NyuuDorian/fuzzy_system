@@ -84,14 +84,15 @@ inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse
 	return inverse_SIGMA;
 }
 
-inline double* calculate_inverse_SIGMA_i_plus_1(int y_i, double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(/*int y_i, */double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
 	//double* new_inverse_SIGMA=new double[dim];
 	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
-		inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		//inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
 	}	
 	//return new_inverse_SIGMA;
 	return inverse_SIGMA_i;
@@ -126,7 +127,7 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 	{
 		V_i+=x_i[j]*SIGMA_i[j]*x_i[j];
 	}
-	if(V_i==0) V_i=0.1;//either problem because it becomes singular (degenerated)
+	if(V_i==0) V_i=0.00000001;//either problem because it becomes singular (degenerated)
 
 //	cerr << "V_i " << V_i << "\t";
 
@@ -520,7 +521,8 @@ int main(int argc, char** argv)
 							/*SIGMA=*/calculate_inverse_SIGMA_i(inverse_SIGMA[t], (int)pow(K,NBRE_COORD), SIGMA[t]);//inverse of inverse gives natural
 							/*MU=*/calculate_MU_i_plus_1(MU[t], SIGMA[t], membership_value_of_x, ALPHA[t], signe, (int)pow(K,NBRE_COORD));
 							diag_X_i(membership_value_of_x, (int)pow(K,NBRE_COORD), diag_X[t]);
-							/*inverse_SIGMA=*/calculate_inverse_SIGMA_i_plus_1(signe, inverse_SIGMA[t], diag_X[t], ALPHA[t], phi, (int)pow(K,NBRE_COORD));
+							/*inverse_SIGMA=*///calculate_inverse_SIGMA_i_plus_1(signe, inverse_SIGMA[t], diag_X[t], ALPHA[t], phi, (int)pow(K,NBRE_COORD));
+							calculate_inverse_SIGMA_i_plus_1(inverse_SIGMA[t], diag_X[t], ALPHA[t], phi, (int)pow(K,NBRE_COORD));
 						}
 
 						mat_of_all_points_rank.erase(mat_of_all_points_rank.begin()+nb_rand); //TODO LIST how to erase that POINT OMG, MAYBE JUST SHUFFLE THE VECTOR WOULD BE OKAY =D

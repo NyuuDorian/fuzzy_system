@@ -84,14 +84,15 @@ inline double* calculate_inverse_SIGMA_i(double* SIGMA, int dim, double* inverse
 	return inverse_SIGMA;
 }
 
-inline double* calculate_inverse_SIGMA_i_plus_1(int y_i, double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
+inline double* calculate_inverse_SIGMA_i_plus_1(/*int y_i, */double* inverse_SIGMA_i, double* DIAG_X_i, double alpha_i, double phi, int dim)
 {
 	//double* new_inverse_SIGMA=new double[dim];
 	//double new_inverse_SIGMA[dim];
 	for(int j=0; j<dim; j++)
 	{
 		//new_inverse_SIGMA[j]=inverse_SIGMA_i[j]+2*alpha_i*phi*DIAG_X_i[j];
-		inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		//inverse_SIGMA_i[j]+=2*alpha_i*y_i*phi*DIAG_X_i[j];
+		inverse_SIGMA_i[j]+=2*alpha_i*phi*DIAG_X_i[j];
 	}	
 	//return new_inverse_SIGMA;
 	return inverse_SIGMA_i;
@@ -126,7 +127,7 @@ inline double calculate_GAMMA_i(int y_i, double* x_i, double* MU_i, double* SIGM
 	{
 		V_i+=x_i[j]*SIGMA_i[j]*x_i[j];
 	}
-	if(V_i==0) V_i=0.1;
+	if(V_i==0) V_i=0.00000001;//either problem because it becomes singular (degenerated)
 
 //	cerr << "V_i " << V_i << "\t";
 
